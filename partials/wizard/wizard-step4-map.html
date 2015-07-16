@@ -1,0 +1,460 @@
+<div data-ng-controller="wizardStep4MapController">
+    <div class="row" style="margin-top: 15px;">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-list fa-fw"></i> {{L.optionsHeader}}
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <form name="wizardJobFormStep4Options"
+                                class="form-horizontal"
+                                role="form"
+                            >
+                                <input type="checkbox"
+                                    name="chkEnableNextButton"
+                                    data-ng-model="savedState.enableNextButton"
+                                    data-ng-hide="true"
+                                    required
+                                >
+                                <h4>{{L.selectConnectionLabel}}</h4>
+                                <div class="form-group"
+                                    data-ng-class="{'has-error': wizardJobFormStep4Options.connectionName.$dirty && wizardJobFormStep4Options.connectionName.$invalid}">
+                                    <div class="col-sm-10">
+                                        <input type="text"
+                                               id="connectionName"
+                                               name="connectionName"
+                                               class="form-control"
+                                               ng-model="savedState.selectedConnection.name"
+                                               ng-readonly="true"
+                                               placeholder="{{L.loadingConnection}}"
+                                               ng-change="setMapSelectedConnection()"
+                                               size="200"
+                                               required>
+
+                                    </div>
+                                </div>
+
+                                <h4>{{L.selectMappingTypeLabel}}</h4>
+                                <div class="form-group"
+                                    data-ng-class="{'has-error': wizardJobFormStep4Options.mappingTypes.$dirty && wizardJobFormStep4Options.mappingTypes.$invalid}"
+                                >
+                                    <div class="col-sm-10">
+                                        <select id="mappingTypes"
+                                            name="mappingTypes"
+                                            class="form-control"
+                                            required
+                                            data-ng-model="savedState.selectedMappingType"
+                                            data-ng-options="mappingType.name for mappingType in savedState.mappingTypes | filter:{active:true}"
+                                            data-ng-change="setMapSelectedMappingType()"
+                                            data-ng-disabled="isBlocking() || !wizardJobFormStep4Options.connectionName.$valid"
+                                        >
+                                            <option disabled value="">{{L.selectMappingTypePlaceholder}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12" collapse="savedState.collapseWizardJobFormStep4OptionsStep3">
+                                    <h4>{{L.selectTableTypeLabel}}</h4>
+                                    <div class="form-group">
+                                        <div class="col-sm-10">
+                                            <select name="mappableObjects"
+                                                class="form-control"
+                                                data-ng-model="savedState.selectedMappableObject"
+                                                data-ng-options="mappableObject.displayName for mappableObject in savedState.mappableObjects | filter:{relationshipType:savedState.selectedMappingType.type}"
+                                                data-ng-required="!savedState.newMappableObjectCheckBox"
+                                                data-ng-disabled="isBlocking() || savedState.newMappableObjectCheckBox"
+                                                data-ng-change="setMapSelectedMappableObject()"
+                                            >
+                                                <option disabled value="">
+                                                    {{interpolate(L.selectTableTypePlaceholder, savedState.selectedMappingType.name)}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div data-ng-show="savedState.selectedMappingType.name == 'List' && savedState.selectedMappableObject.isTemplate">
+                                        {{interpolate(L.listNameTemplate, savedState.selectedMappableObject.templateName)}}
+                                    </div>
+
+                                    <h4 style="margin-left: 5px;">
+                                        {{interpolate(L.addTableLabel, savedState.selectedMappingType.name)}}
+                                    </h4>
+                                    <div class="form-group"
+                                        data-ng-class="{'has-error': wizardJobFormStep4Options.savedState.newMappableObject.$dirty && wizardJobFormStep4Options.newMappableObject.$invalid}"
+                                    >
+                                        <div class="col-sm-10">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                    <input type="checkbox"
+                                                        data-ng-model="savedState.newMappableObjectCheckBox"
+                                                        data-ng-change="setIsNewMappableObject(savedState.newMappableObjectCheckBox)"
+                                                        data-ng-disabled="isBlocking()"
+                                                    >
+                                                </span>
+                                                <input id="newMappableObject"
+                                                    name="newMappableObject"
+                                                    type="text"
+                                                    class="form-control"
+                                                    placeholder="{{interpolate(L.addTablePlaceholder, savedState.selectedMappingType.name)}}"
+                                                    data-ng-model="savedState.newMappableObject.name"
+                                                    data-ng-disabled="isBlocking()"
+                                                    data-ng-readonly="!savedState.newMappableObjectCheckBox"
+                                                    data-ng-required="savedState.newMappableObjectCheckBox"
+                                                    data-ng-pattern="checkRegEx"
+                                                    data-ng-minlength="5"
+                                                    data-ng-maxlength="32"
+                                                    maxlength="32"
+                                                >
+                                            </div>
+                                            <span class="error"
+                                                style="color: #a94442; font-size: 12px;"
+                                                data-ng-show="wizardJobFormStep4Options.newMappableObject.$dirty && wizardJobFormStep4Options.newMappableObject.$error.required"
+                                            >{{L.errorTableRequired}}</span>
+                                            <span class="error"
+                                                style="color: #a94442; font-size: 12px;"
+                                                data-ng-show="wizardJobFormStep4Options.newMappableObject.$dirty && wizardJobFormStep4Options.newMappableObject.$error.minlength"
+                                            >{{L.errorTableMinLength}}</span>
+                                            <span class="error"
+                                                style="color: #a94442; font-size: 12px;"
+                                                data-ng-show="wizardJobFormStep4Options.newMappableObject.$dirty && wizardJobFormStep4Options.newMappableObject.$error.maxlength"
+                                            >{{L.errorTableMaxLength}}</span>
+                                            <span class="error"
+                                                style="color: #a94442; font-size: 12px;"
+                                                data-ng-show="wizardJobFormStep4Options.newMappableObject.$dirty && wizardJobFormStep4Options.newMappableObject.$error.pattern && savedState.selectedMappingType.name != 'List'"
+                                            >{{L.errorTablePattern}}</span>
+                                            <span class="error"
+                                                style="color: #a94442; font-size: 12px;"
+                                                data-ng-show="wizardJobFormStep4Options.newMappableObject.$dirty && wizardJobFormStep4Options.newMappableObject.$error.pattern && savedState.selectedMappingType.name == 'List'"
+                                            >{{L.errorTableInvalidListName}}</span>
+                                            <alert style="margin-top: 10px;"
+                                                data-ng-repeat="mapValidationAlert in mapValidationAlerts"
+                                                type="mapValidationAlert.type"
+                                                close="closeMapValidationAlert($index)"
+                                            >{{mapValidationAlert.msg}}</alert>
+                                        </div>
+
+                                        <div class="col-sm-2">
+                                            <button type="submit"
+                                                class="btn btn-info"
+                                                style="margin-left: 10px;"
+                                                data-ng-show="savedState.newMappableObjectCheckBox"
+                                                data-ng-disabled="isBlocking() || (savedState.newMappableObjectCheckBox && !wizardJobFormStep4Options.newMappableObject.$valid) || savedState.isValidListNewExec"
+                                                data-ng-click="checkNewMappableObject()"
+                                            >
+                                                <i class="fa fa-check fa-fw"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-10"
+                                        data-ng-show="jobConfigTemplate.jobType == 'RECURRING' && savedState.selectedMappingType.name == 'List' && savedState.newMappableObjectCheckBox"
+                                    >
+                                        <h4 style="margin-left: 5px;">
+                                            {{L.newListOnExecLabel}}
+                                        </h4>
+                                        <div class="input-group">
+                                            <span class="input-group-addon">
+                                                <input type="checkbox"
+                                                    id="newListNameOnExecution"
+                                                    name="newListNameOnExecution"
+                                                    data-ng-model="savedState.newListNameOnExecution"
+                                                    data-ng-disabled="isBlocking()"
+                                                    data-ng-change="resetListExecName(savedState.newListNameOnExecution)"
+                                                >
+                                            </span>
+                                            <input id="listPrefix"
+                                                name="listPrefix"
+                                                type="text"
+                                                class="form-control"
+                                                placeholder="{{L.newListOnExecPrefixPlaceholder}}"
+                                                data-ng-model="savedState.listPrefix"
+                                                data-ng-readonly="!savedState.newListNameOnExecution"
+                                                data-ng-disabled="isBlocking() || !savedState.newListNameOnExecution"
+                                                data-ng-maxlength="20"
+                                                data-ng-pattern="checkRegEx"
+                                            >
+                                            <select name="listSuffix"
+                                                id="listSuffix"
+                                                class="form-control"
+                                                data-ng-model="savedState.listSuffix"
+                                                data-ng-options="listSuffixFormat.label for listSuffixFormat in savedState.listSuffixFormats"
+                                                data-ng-required="newListOnExecution"
+                                                data-ng-readonly="!savedState.newListNameOnExecution"
+                                                data-ng-disabled="isBlocking() || !savedState.newListNameOnExecution"
+                                                data-ng-change="checkListSuffix(savedState.listSuffix)"
+                                            >
+                                                <option disabled value="">
+                                                    {{L.selectListSuffixPlaceholder}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <span class="error"
+                                            style="color: #a94442; font-size: 12px;"
+                                            data-ng-show="savedState.newListNameOnExecution && savedState.listSuffix.value == null"
+                                        >{{L.errorListSuffixRequired}}</span>
+
+                                        <div data-ng-show="savedState.newMappableObject.name != null && savedState.newListNameOnExecution">
+                                            {{L.newListNameTemplateLabel}}:
+                                            <strong>
+                                                {{ savedState.listPrefix }}
+                                                <span data-ng-show="savedState.listPrefix != null && savedState.newMappableObject.name != null">_</span>{{ savedState.newMappableObject.name }}<span data-ng-show="savedState.newMappableObject.name != null && savedState.listSuffix.value">_</span>{{ savedState.listSuffix.value }}
+                                            </strong>
+                                        </div>
+                                        <div>
+                                            <span class="error"
+                                                style="color: #a94442; font-size: 12px;"
+                                                data-ng-show="savedState.newListNameOnExecution && wizardJobFormStep4Options.listPrefix.$dirty && wizardJobFormStep4Options.listPrefix.$error.maxlength"
+                                            >{{L.errorListPrefixMaxLength}}</span>
+                                            <span class="error"
+                                                style="color: #a94442; font-size: 12px;"
+                                                data-ng-show="savedState.newListNameOnExecution && wizardJobFormStep4Options.listPrefix.$dirty && wizardJobFormStep4Options.listPrefix.$error.pattern"
+                                            >{{L.errorListPrefixPattern}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-lg-6">
+                            <div collapse="savedState.collapseWizardJobFormStep4OptionsStep4">
+                                <div class="col-sm-12">
+                                    <h4>
+                                        {{L.selectDataMapTypeLabel}}
+                                        <a class="pull-right"
+                                            data-ng-click="savedState.collapseWizardJobFormStep4Tooltip = !savedState.collapseWizardJobFormStep4Tooltip"
+                                        >
+                                            <i class="fa fa-question-circle fa-fw"></i>
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div class="col-sm-12"
+                                    collapse="savedState.collapseWizardJobFormStep4Tooltip"
+                                >
+                                    <div class="alert alert-info"
+                                        data-ng-bind-html="selectDataMapTypeHelp"
+                                    ></div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="btn-group btn-group-justified">
+                                        <div class="btn-group">
+                                            <button type="button"
+                                                class="btn btn-default"
+                                                data-ng-model="savedState.selectedMappingBehaviour"
+                                                btn-radio="'FACT'"
+                                                data-ng-change="setMappingBehaviour()"
+                                                data-ng-disabled="isBlocking() || savedState.disableStep4MappingBehaviour"
+                                            >{{L.factRadioLabel}}</button>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button type="button"
+                                                class="btn btn-default"
+                                                data-ng-model="savedState.selectedMappingBehaviour"
+                                                btn-radio="'DIMENSION'"
+                                                data-ng-change="setMappingBehaviour()"
+                                                data-ng-disabled="isBlocking() || savedState.disableStep4MappingBehaviour"
+                                            >{{L.dimensionRadioLabel}}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <!-- left empty to fill out the child div-->
+                                </div>
+                            </div>
+                            <div collapse="savedState.collapseWizardJobFormStep5Fact">
+                                <div class="col-sm-12">
+                                    <h4>
+                                        {{L.selectDataLoadTypeLabel}}
+                                        <a class="pull-right"
+                                            data-ng-click="savedState.collapseWizardJobFormStep5FactTooltip = !savedState.collapseWizardJobFormStep5FactTooltip"
+                                        >
+                                            <i class="fa fa-question-circle fa-fw"></i>
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div class="col-sm-12"
+                                    collapse="savedState.collapseWizardJobFormStep5FactTooltip"
+                                >
+                                    <div class="alert alert-info"
+                                        data-ng-bind-html="selectDataLoadTypeFactHelp"
+                                    ></div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="btn-group btn-group-justified">
+                                        <div class="btn-group">
+                                            <button type="button"
+                                                class="btn btn-default"
+                                                btn-radio="'UPSERT'"
+                                                data-ng-model="savedState.selectedMappingLoadType"
+                                                data-ng-disabled="isBlocking()"
+                                                data-ng-change="setMappingLoadType()"
+                                            >{{L.appendRadioLabel}}</button>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button type="button"
+                                                class="btn btn-default"
+                                                btn-radio="'OVERWRITE'"
+                                                data-ng-model="savedState.selectedMappingLoadType"
+                                                data-ng-disabled="isBlocking()"
+                                                data-ng-change="setMappingLoadType()"
+                                            >{{L.overwriteRadioLabel}}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <!-- left empty to fill out the child div-->
+                                </div>
+                            </div>
+                            <div collapse="savedState.collapseWizardJobFormStep5Dimension">
+                                <div class="col-sm-12">
+                                    <h4>
+                                        {{L.selectDataLoadTypeLabel}}
+                                        <a class="pull-right"
+                                            data-ng-click="savedState.collapseWizardJobFormStep5DimensionTooltip = !savedState.collapseWizardJobFormStep5DimensionTooltip"
+                                        >
+                                            <i class="fa fa-question-circle fa-fw"></i>
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div class="col-sm-12"
+                                    collapse="savedState.collapseWizardJobFormStep5DimensionTooltip"
+                                >
+                                    <div class="alert alert-info"
+                                        data-ng-bind-html="selectDataLoadTypeDimensionHelp"
+                                    ></div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="btn-group btn-group-justified">
+                                        <div class="btn-group">
+                                            <button type="button"
+                                                class="btn btn-default"
+                                                btn-radio="'UPSERT'"
+                                                data-ng-model="savedState.selectedMappingLoadType"
+                                                data-ng-disabled="isBlocking()"
+                                                data-ng-change="setMappingLoadType(); tableform.$show()"
+                                            >{{L.upsertRadioLabel}}</button>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button type="button"
+                                                class="btn btn-default"
+                                                btn-radio="'OVERWRITE'"
+                                                data-ng-model="savedState.selectedMappingLoadType"
+                                                data-ng-disabled="isBlocking()"
+                                                data-ng-change="setMappingLoadType()"
+                                            >{{L.overwriteRadioLabel}}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <!-- left empty to fill out the child div-->
+                                </div>
+                            </div>
+
+                            <div class="col-sm-12" collapse="savedState.collapseWizardJobFormStep6KeyMapping">
+                                <hr>
+                                <h4>
+                                    {{L.keyMappingLabel}}
+                                    <a class="pull-right"
+                                        data-ng-click="savedState.collapseWizardJobFormStep6KeyMappingTooltip = !savedState.collapseWizardJobFormStep6KeyMappingTooltip"
+                                    >
+                                        <i class="fa fa-question-circle fa-fw"></i>
+                                    </a>
+                                </h4>
+                                <div collapse="savedState.collapseWizardJobFormStep6KeyMappingTooltip">
+                                    <div class="alert alert-info">
+                                        {{interpolate(L.keyMappingHelp, savedState.selectedMappingType.name)}}
+                                    </div>
+                                </div>
+                                <table class="table table-bordered table-condensed">
+                                    <thead>
+                                        <tr style="font-weight: bold">
+                                            <th style="width:50%; text-align: center;">
+                                                {{L.inputHeader}}
+                                            </th>
+                                            <th style="width:50%; text-align: center;">
+                                                {{L.keyHeader}}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-ng-repeat="key in savedState.selectedMappableObjectKeys">
+                                            <td>
+                                                <div class="col-sm-12">
+                                                    <select id="inputFieldsForKeySelection"
+                                                        name="inputFieldsForKeySelection"
+                                                        class="form-control"
+                                                        data-ng-model="savedState.selectedKeys[$index]"
+                                                        data-ng-options="hr.name for hr in savedState.headerRecord"
+                                                        data-ng-change="setSelectedKeyMapping(savedState.selectedKeys[$index], key)"
+                                                        data-ng-disabled="isBlocking()"
+                                                        required
+                                                    >
+                                                        <option disabled value="">
+                                                            {{L.selectInputPlaceholder}}
+                                                        </option>
+                                                    </select>
+                                                    <!-- #{{key}}# -->
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <input type="text"
+                                                            class="form-control"
+                                                            value="{{key.name}}"
+                                                            readonly
+                                                            data-ng-disabled="isBlocking()"
+                                                        >
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="col-sm-12"
+                                collapse="savedState.collapseWizardJobFormStep6KeySelection"
+                            >
+                                <h4>
+                                    {{L.inputKeyLabel}}
+                                    <a class="pull-right"
+                                        data-ng-click="savedState.collapseWizardJobFormStep6KeySelectionTooltip = !savedState.collapseWizardJobFormStep6KeySelectionTooltip"
+                                    >
+                                        <i class="fa fa-question-circle fa-fw"></i>
+                                    </a>
+                                </h4>
+                                <div collapse="savedState.collapseWizardJobFormStep6KeySelectionTooltip">
+                                    <div class="alert alert-info">
+                                        {{L.inputKeyHelp}}
+                                    </div>
+                                </div>
+                                <div class="form-group"
+                                    data-ng-class="{'has-error': wizardJobFormStep4Options.inputFieldsForKeySelectionLookup.$dirty && wizardJobFormStep4Options.inputFieldsForKeySelectionLookup.$invalid}"
+                                >
+                                    <div class="col-sm-10">
+                                        <select id="inputFieldsForKeySelectionLookup"
+                                            name="inputFieldsForKeySelectionLookup"
+                                            class="form-control"
+                                            data-ng-model="savedState.selectedKey"
+                                            data-ng-options="hr.name for hr in savedState.headerRecord"
+                                            data-ng-change="setSelectedKeySelection(savedState.selectedKey)"
+                                            data-ng-disabled="isBlocking()"
+                                            required
+                                        >
+                                            <option disabled value="">
+                                                {{L.selectInputKeyPlaceholder}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" data-ng-show="savedState.showMapping">
+        <div data-ng-include="savedState.mappingTemplate"></div>
+    </div>
+</div>

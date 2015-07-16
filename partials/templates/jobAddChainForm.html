@@ -1,0 +1,147 @@
+<form name="frmAddChain" class="form-horizontal" role="form">
+    <div class="panel-body">
+        <div class="panel-body">
+            <div class="col-lg-8">
+                <div class="form-group"
+                     data-ng-class="{'has-error': frmAddChain.txtName.$dirty && frmAddChain.txtName.$invalid}"
+                        >
+                    <label for="txtName" class="col-sm-3 control-label">
+                        * {{L.chainName}}:
+                    </label>
+
+                    <div class="col-sm-7">
+                        <input id="txtName"
+                               name="txtName"
+                               type="text"
+                               class="form-control"
+                               data-ng-model="chainProperties.name"
+                               data-ng-minlength="5"
+                               maxlength="100"
+                               data-ng-maxlength="100"
+                               placeholder="{{L.chainNamePlaceholder}}"
+                               autocomplete="off"
+                               required="required"
+                               data-ng-disabled="isBlocking()"
+                                >
+                    <span class="error"
+                          data-ng-show="frmAddChain.txtName.$error.required"
+                            >{{L.errorChainNameRequired}}</span>
+                    <span class="error"
+                          data-ng-show="frmAddChain.txtName.$dirty && frmAddChain.txtName.$error.minlength"
+                            >{{L.errorChainNameMinLength}}</span>
+                    <span class="error"
+                          data-ng-show="frmAddChain.txtName.$dirty && frmAddChain.txtName.$error.maxlength"
+                            >{{L.errorChainNameMaxLength}}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="txtDesc" class="col-sm-3 control-label">
+                        {{L.chainDescription}}:
+                    </label>
+
+                    <div class="col-sm-7">
+                        <input id="txtDesc"
+                               name="txtDesc"
+                               type="text"
+                               class="form-control"
+                               data-ng-model="chainProperties.description"
+                               maxlength="255"
+                               data-ng-maxlength="255"
+                               autocomplete="off"
+                               placeholder="{{L.chainDescriptionPlaceholder}}"
+                               data-ng-disabled="isBlocking()"
+                                >
+                    <span class="error"
+                          data-ng-show="frmAddChain.txtDesc.$dirty && frmAddChain.txtDesc.$error.maxlength"
+                            >{{L.errorChainDescriptionMaxLength}}</span>
+                    </div>
+                </div>
+
+                <div class="form-group"
+                     data-ng-repeat="jobID in chainProperties.jobIDChain"
+                        >
+                    <label for="txtDesc" class="col-sm-3 control-label">
+                        <span data-ng-hide="!$first">*</span>
+                        {{interpolate(L.chainedJobLabel, $index + 1)}}:
+                    </label>
+
+                    <div class="col-sm-5">
+                        <select class="form-control"
+                                data-ng-model="chainProperties.jobIDChain[$index]"
+                                data-ng-options="chainableJob.id as chainableJob.name for chainableJob in selectableJobs[$index]"
+                                data-ng-change="rebuildSelectableJobs()"
+                                data-ng-disabled="(1 > chainableJobs.length) || isBlocking()"
+                                data-ng-required="$first"
+                                >
+                            <option disabled value="">
+                                {{defaultChainJobSelection}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3">
+                        <a class="iconified-inline-button"
+                           title="{{L.removeChainedJob}}"
+                           data-ng-hide="$first && (2 > chainProperties.jobIDChain.length)"
+                           data-ng-click="removeJob($index)"
+                                ><i class="fa fa-lg fa-minus-circle"></i></a>
+                        <a class="iconified-inline-button"
+                           title="{{L.moveChainedJobUp}}"
+                           data-ng-hide="$first"
+                           data-ng-click="moveJob($index, -1)"
+                                ><i class="fa fa-lg fa-arrow-circle-o-up"></i></a>
+                        <a class="iconified-inline-button"
+                           title="{{L.moveChainedJobDown}}"
+                           data-ng-hide="$last"
+                           data-ng-click="moveJob($index, 1)"
+                                ><i class="fa fa-lg fa-arrow-circle-o-down"></i></a>
+                        <a class="iconified-inline-button"
+                           title="{{L.addChainedJob}}"
+                           data-ng-click="addJob($index)"
+                           data-ng-hide="hasNullJob() || (2 > selectableJobs[$index].length)"
+                                ><i class="fa fa-lg fa-plus-circle"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="form-group">
+                    <label for="chkChainSchedule" class="col-sm-5 control-label">
+                        <i class="fa"
+                           data-ng-class="{'fa-plus': !showSchedule.isActive, 'fa-minus': showSchedule.isActive}"
+                                ></i>
+                        &nbsp;{{L.chainExecutionSchedule}}
+                    </label>
+                    <div class="col-sm-1">
+                        <input id="chkChainSchedule"
+                               name="chkChainSchedule"
+                               class="form-control"
+                               type="checkbox"
+                               data-ng-model="showSchedule.isActive"
+                               data-ng-hide="true"
+                               data-ng-disabled="isBlocking()"
+                                >
+                    </div>
+                    <br style="clear: both;">
+                    <input type="checkbox"
+                           data-ng-model="isScheduleValid"
+                           data-ng-hide="true"
+                           data-ng-required="showSchedule.isActive"
+                            >
+
+                    <div id="recurringScheduleDiv"
+                         data-ng-show="showSchedule.isActive"
+                         data-ng-include="htmlTemplates.recurringSchedule"
+                            ></div>
+                </div>
+            </div>
+        </div>
+        <div class="wizardButtonBar">
+            <button type="button"
+                    class="btn btn-info pull-right"
+                    data-ng-disabled="!frmAddChain.$valid || hasNullJob() || isBlocking()"
+                    data-ng-click="onSave()"
+                    >Save
+            </button>
+        </div>
+    </div>
+</form>

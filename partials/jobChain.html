@@ -1,0 +1,21 @@
+<div id="page-wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">{{L.newJobChain}}</h1>
+        </div>
+    </div>
+    <alert data-ng-repeat="alert in alerts"
+           type="alert.type"
+           close="closeAlert($index)"
+            >{{alert.msg}}
+    </alert>
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-chain fa-fw"></i>Job Chain
+            </div>
+                <div data-ng-include="htmlTemplates.newChainForm"></div>
+        </div>
+    </div>
+    <span us-spinner spinner-key="busySpinner"></span>
+</div>

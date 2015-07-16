@@ -1,0 +1,211 @@
+<div data-ng-controller="mappingNewExtensionController">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-random fa-fw"></i> {{L.mapSectionHeader}}
+            </div>
+
+            <div class="panel-body" data-ng-hide="validSdmExtensionMapping">
+                <div class="row" style="color: #a94442; font-size: 12px;">&nbsp;A new Extension cannot map all SDM columns.  Select mapping type
+                    'Standard
+                    Data Model' in step 2 if <b>ALL</b> fields map to the SDM.</div>
+            </div>
+
+           <div class="panel-body">
+               <div class="row">
+                   <div class="col-lg-12" style="overflow: auto">
+                       <table class="table table-bordered table-hover table-condensed">
+                           <tr style="font-weight: bold">
+                               <td style="width: 25%; text-align: center;">
+                                   {{L.inputHeader}}
+                               </td>
+                               <td style="width: 5%; text-align: center;">
+                                   {{L.sdmHeader}}
+                               </td>
+                               <td style="width: 20%; text-align: center;">
+                                   {{L.destHeader}}
+                               </td>
+                               <td style="width: 10%; text-align: center;">
+                                   {{L.dataTypeHeader}}
+                               </td>
+                               <td style="width: 5%; text-align: center;">
+                                   {{L.sizeHeader}}
+                               </td>
+                               <td style="width: 15%; text-align: center;">
+                                   {{L.formatHeader}}
+                               </td>
+                               <td style="width: 10%; text-align: center;">
+                                   {{L.defaultHeader}}
+                               </td>
+                               <td style="width: 5%; text-align: center">
+                                   {{L.requiredHeader}}
+                               </td>
+                               <td style="width: 5%; text-align: center;"></td>
+                           </tr>
+                           <tr data-ng-repeat="mappingRecord in savedState.mappingRecords"
+                               data-ng-style="{ background :  mappingRecord.isKeyColumn && '#D3D3D3' }"
+                           >
+                               <td>
+                                   <a href="">
+                                       <span class="fa fa-question-circle fa-fw"
+                                           title="{{L.keyTooltip}}"
+                                           data-ng-if="mappingRecord.isKeyColumn"
+                                       ></span>
+                                       <i class="fa fa-key fa-fw"
+                                           data-ng-if="mappingRecord.isKeyColumn"
+                                       ></i>
+                                       {{ mappingRecord.inputName || L.emptyKey }}
+                                   </a>
+                               </td>
+                               <td style="text-align: center">
+                                   <a href=""
+                                       e-form="rowform"
+                                       buttons="no"
+                                       editable-checkbox="mappingRecord.isSdmMapping"
+                                       e-ng-change="setSdm($data, $index)"
+                                   >
+                                       {{ mappingRecord.isSdmMapping && L.isSDMField || L.isNotSDMField }}
+                                   </a>
+                               </td>
+                               <td>
+                                   <span e-form="rowform"
+                                       data-ng-if="mappingRecord.isSdmMapping"
+                                       editable-select="mappingRecord.mappedSdmFieldId"
+                                       e-name="mappedDestinationRecord"
+                                       e-ng-options="sdmField.id as sdmField.mapping for sdmField in sdmFields"
+                                       e-ng-change="setSdmField($data, $index)"
+                                       onbeforesave="validateSdmFieldBeforeSave($data, $index)"
+                                   >
+                                       {{ showSdmFields(mappingRecord) || L.destinationNotMapped }}
+                                   </span>
+                                   <div>
+                                       <p data-ng-if="!mappingRecord.isSdmMapping"
+                                           e-form="rowform"
+                                           editable-text="mappingRecord.destName"
+                                           e-ng-disabled="mappingRecord.isKeyColumn"
+                                           onbeforesave="validateFieldNameBeforeSave($data, $index)"
+                                       >
+                                           {{ mappingRecord.destName || L.destinationNotMapped }}
+                                       </p>
+                                   </div>
+                               </td>
+                               <td style="text-align: center">
+                                   <p data-ng-if="mappingRecord.isSdmMapping">
+                                       {{ showSdmFieldDataType(mappingRecord) }}
+                                   </p>
+                                   <p data-ng-if="!mappingRecord.isSdmMapping"
+                                       e-form="rowform"
+                                       editable-select="mappingRecord.dataTypeId"
+                                       e-name="dataType"
+                                       e-ng-options="dataType.id as dataType.value for dataType in savedState.dataTypes"
+                                       e-ng-change="enableProperties($data, $index)"
+                                       e-ng-required="true"
+                                       onshow="enableProperties($data, $index)"
+                                       onaftersave="validateDataTypeAfterSave($data, $index)"
+                                   >
+                                       {{ showDataTypes(mappingRecord) }}
+                                   </p>
+                               </td>
+                               <td style="text-align: center">
+                                   <p data-ng-if="mappingRecord.isSdmMapping">
+                                       {{ showSdmFieldSize(mappingRecord) }}
+                                   </p>
+                                   <p data-ng-if="!mappingRecord.isSdmMapping"
+                                       e-form="rowform"
+                                       e-ng-disabled="savedState.disableSizeSelect"
+                                       editable-text="mappingRecord.size"
+                                       onbeforesave="validateSizeBeforeSave($data)"
+                                       onaftersave="validateSizeAfterSave($data, $index)"
+                                   >
+                                       {{ mappingRecord.size || '' }}
+                                   </p>
+                               </td>
+                               <td style="text-align: center">
+                                   <span e-ng-disabled="savedState.disableFormatSelect"
+                                       e-form="rowform"
+                                       editable-select="mappingRecord.format"
+                                       e-name="format"
+                                       e-ng-options="format.id as format.pattern for format in savedState.formats"
+                                       onshow="loadFormats()"
+                                       onbeforesave="validateFormatBeforeSave($data)"
+                                   >
+                                       {{ showFormats(mappingRecord) }}
+                                   </span>
+                               </td>
+                               <td>
+                                   <span e-form="rowform"
+                                       editable-text="mappingRecord.defaultValue"
+                                       data-ng-if="!mappingRecord.isSdmMapping"
+                                       e-ng-disabled="true"
+                                   >
+                                       {{ mappingRecord.defaultValue || '' }}
+                                   </span>
+                               </td>
+                               <td style="text-align: center">
+                                   <a href=""
+                                       e-form="rowform"
+                                       buttons="no"
+                                       editable-checkbox="mappingRecord.isRequired"
+                                       >
+                                       {{ mappingRecord.isRequired && L.isRequiredField || L.isNotRequiredField }}
+                                   </a>
+                               </td>
+                               <td style="white-space: nowrap">
+                                   <form name="rowform"
+                                       editable-form
+                                       onbeforesave=""
+                                       data-ng-show="rowform.$visible"
+                                       class="form-buttons form-inline"
+                                       shown="false"
+                                   >
+                                       <button type="submit"
+                                           class="btn btn-primary"
+                                           data-ng-disabled="rowform.$waiting"
+                                       >
+                                           <i class="fa fa-check fa-fw"></i>
+                                       </button>
+                                       <button type="button"
+                                           class="btn btn-default"
+                                           data-ng-disabled="rowform.$waiting"
+                                           data-ng-click="rowform.$cancel(); resetMappingRecord($index)"
+                                       >
+                                           <i class="fa fa-trash-o fa-fw"></i>
+                                       </button>
+                                   </form>
+                                   <div class="buttons"
+                                       data-ng-show="!rowform.$visible"
+                                   >
+                                       <button type="button"
+                                           class="btn btn-default"
+                                           data-ng-disabled="mappingRecord.isKeyColumn"
+                                           data-ng-click="rowform.$show(); enableProperties(mappingRecord.dataTypeId, $index)"
+                                       >
+                                           <i class="fa fa-pencil fa-fw"></i>
+                                       </button>
+                                   </div>
+                               </td>
+                           </tr>
+                       </table>
+
+                       <form name="validsdmform">
+                       <input type="checkbox"
+                              name="validSdmExtensionMapping"
+                              data-ng-model="validSdmExtensionMapping"
+                              data-ng-hide="true"
+                              data-ng-click="checkSdmExtension()"
+                              required
+                               >
+                       </form>
+
+                       <button type="button"
+                           class="btn btn-default"
+                           data-ng-hide="true"
+                           data-ng-disabled="true"
+                           data-ng-click="addInputField()"
+                       ><i class="fa fa-plus fa-fw"></i></button>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
+</div>

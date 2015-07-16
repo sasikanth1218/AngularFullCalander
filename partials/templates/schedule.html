@@ -1,0 +1,232 @@
+<div ng-controller="scheduleController">
+    <ng-form name="scheduleForm">
+        <h4>Schedule</h4>
+        <div class="row">
+            <div class="form-group" ng-class="{'has-error': scheduleForm.scheduleFormName.$dirty && scheduleForm.scheduleFormName.$invalid}">
+                <label for="scheduleFormName" class="col-sm-3 control-label">Name</label>
+                <div class="col-sm-6">
+                    <input id="scheduleFormName" name="scheduleFormName" type="text" class="form-control" ng-model="scheduleTemplate.name" ng-required= "showSchedule.isActive && showSchedule.mode() === schedulingModes.RECURRING" ng-maxlength="255"/>
+                    <span class="error" style="color: #a94442; font-size: 12px" ng-show="scheduleForm.scheduleFormName.$dirty && scheduleForm.scheduleFormName.$error.required">Required!</span>
+                    <span class="error" style="color: #a94442; font-size: 12px" ng-show="scheduleForm.scheduleFormName.$dirty && scheduleForm.scheduleFormName.$error.maxlength">Max length is 255</span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group" ng-class="{'has-error': scheduleForm.scheduleFormDescription.$dirty && scheduleForm.scheduleFormDescription.$invalid}">
+                <label for="scheduleFormDescription" class="col-sm-3 control-label">Description</label>
+                <div class="col-sm-6">
+                    <input id="scheduleFormDescription" name="scheduleFormDescription" type="text" class="form-control" ng-model="scheduleTemplate.description" ng-maxlength="255"/>
+                    <span class="error" style="color: #a94442; font-size: 12px" ng-show="scheduleForm.scheduleFormDescription.$dirty && scheduleForm.scheduleFormDescription.$error.maxlength">Max length is 255</span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group" ng-class="{'has-error': scheduleForm.scheduleFormStartDate.$dirty && scheduleForm.scheduleFormStartDate.$invalid}">
+                <label for="scheduleFormStartDate" class="col-sm-3 control-label">Start Date:</label>
+                <div class="col-sm-3">
+                    <div class="input-group">
+                        <input id="scheduleFormStartDate" name="scheduleFormStartDate" type="text" class="form-control" datepicker-popup="" ng-model="scheduleTemplate.startDate" is-open="startDatePopupOpened" show-weeks="false" min="minDate" close-text="Close" ng-click="openStartDatePopup($event)" ng-required="showSchedule.isActive && showSchedule.mode() === schedulingModes.RECURRING"/>
+                        <span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+                    </div>
+                    <span class="error" style="color: #a94442; font-size: 12px" ng-show="scheduleForm.scheduleFormStartDate.$dirty && scheduleForm.scheduleFormStartDate.$error.required">Required!</span>
+                </div>
+                <div class="col-sm-3">
+                    <input style="width:120px;" type="time" name="scheduleFormStartTime" ng-model="scheduleTemplate.startTime" class="form-control" placeholder="HH:mm:ss" required/>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group" ng-class="{'has-error': scheduleForm.scheduleFormEndDate.$dirty && scheduleForm.scheduleFormEndDate.$invalid}">
+                <label for="scheduleFormEndDate" class="col-sm-3 control-label">End Date:</label>
+                <div class="col-sm-3">
+                    <div class="input-group">
+                        <input id="scheduleFormEndDate" name="scheduleFormEndDate" type="text" class="form-control" datepicker-popup="" ng-model="scheduleTemplate.endDate" is-open="endDatePopupOpened" min="scheduleTemplate.startDate" ng-disabled="scheduleTemplate.startDate ? false : true" show-weeks="false" close-text="Close" ng-click="openEndDatePopup($event)" ng-required="showSchedule.isActive && showSchedule.mode() === schedulingModes.RECURRING"/>
+                        <span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+                    </div>
+                    <span class="error" style="color: #a94442; font-size: 12px" ng-show="scheduleForm.scheduleFormEndDate.$dirty && scheduleForm.scheduleFormEndDate.$error.required">Required!</span>
+                </div>
+                <div class="col-sm-3">
+                    <input style="width:120px;" type="time" name="scheduleFormEndTime" ng-model="scheduleTemplate.endTime" class="form-control" ng-disabled="scheduleTemplate.startDate ? false : true" placeholder="HH:mm:ss" required/>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group" ng-class="{'has-error': scheduleForm.scheduleFormTimeZone.$dirty && scheduleForm.scheduleFormTimeZone.$invalid}">
+                <label for="scheduleFormTimeZone" class="col-sm-3 control-label">Time Zone:</label>
+                <div class="col-sm-4">
+                    <select ng-model="scheduleTemplate.zone" name="zone" style="margin-bottom:15px;" class="form-control" ng-options="zone.value as zone.name for zone in timeZones">
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group" ng-class="{'has-error': scheduleForm.scheduleFormEnabled.$dirty && scheduleForm.scheduleFormEnabled.$invalid}">
+                <div class="col-sm-9 col-sm-offset-3">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" ng-model="scheduleTemplate.enabled"> Enabled<a class="pull-right" ng-click="collapseScheduleEnabledTooltip = !collapseScheduleEnabledTooltip"><i style="font-size: 16px;width:250px;" class="fa fa-question-circle fa-fw"></i></a>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" collapse="collapseScheduleEnabledTooltip">
+                <div class=" alert alert-info">
+                    Awaiting Tooltip Copy.
+                </div>
+            </div>
+        </div>
+        <a class="pull-right" ng-click="collapseScheduleRunEveryTooltip = !collapseScheduleRunEveryTooltip"><i style="font-size: 16px; width:222px;" class="fa fa-question-circle fa-fw"></i></a>
+        <div class="row">
+            <div class="col-sm-12" collapse="collapseScheduleRunEveryTooltip">
+                <div class=" alert alert-info">
+                    A <strong>schedule</strong> can be defined as either a combination of the inputs below or as a crontab string.
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-sm-3 control-label">&nbsp;</label>
+            ** All date and time schedules will be recorded in <strong>UTC</strong>
+        </div>
+        <div class="row">
+            <label for="scheduleFormRepeat" class="col-sm-3 control-label">Repeat:</label>
+            <div class="col-lg-3">
+                <select class="form-control" style="margin-bottom:15px;" ng-disabled="enableCronInput" ng-model="scheduleTemplate.customerOption" ng-options="opt.value as opt.name for opt in customerOptions" ng-required="showSchedule.isActive && showSchedule.mode() === schedulingModes.RECURRING && !enableCronInput" ng-disabled="enableCronInput">
+                    <option value="">Select repeat frequency</option>
+                </select>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group" ng-class="{'has-error': scheduleForm.scheduleFormTime.$dirty && scheduleForm.scheduleFormTime.$invalid}">
+                    <label for="scheduleFormTime" class="control-label">Time:</label>
+                    <select ng-model="scheduleTemplate.hour" id="scheduleRecurringHour" ng-disabled="enableCronInput" class="form-control" style="width:auto;display:inline-block" ng-options="opt.label for opt in hours">
+                    </select>
+                    <span>:</span>
+                    <select ng-model="scheduleTemplate.minute" id="scheduleRecurringMin" ng-disabled="enableCronInput" class="form-control" style="width:auto;display:inline-block" ng-options="opt.label for opt in minutes">
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="animate-switch-container" ng-switch on="scheduleTemplate.customerOption">
+            <div ng-switch-when="daily" ng-model="daily">
+                <div class="row">
+                    <div class="form-group" ng-class="{'has-error': scheduleForm.scheduleFormRepeatDays.$dirty && scheduleForm.scheduleFormRepeatDays.$invalid}">
+                        <label for="scheduleFormRepeatDays" class="col-sm-3 control-label">Run every:</label>
+                        <div class="col-sm-6">
+                            <div>
+                                <input id="scheduleFormRepeatDays" type="number" class="form-control" name="scheduleFormRepeatDays" ng-model="scheduleTemplate.daily.repeatDays" min="1" max="31" ng-required="!enableCronInput && !scheduleTemplate.daily.weekdaysOnly" style="width:100px;display:inline-block" ng-disabled="enableCronInput || scheduleTemplate.daily.weekdaysOnly">
+                                <label for="scheduleFormRepeatDays" class="control-label">day(s)</label>
+                            </div>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show=" scheduleForm.scheduleFormRepeatDays.$dirty && scheduleForm.scheduleFormRepeatDays.$invalid">Enter days between 1-31</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-9 col-sm-offset-3">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="scheduleTemplate.daily.weekdaysOnly" ng-disabled="enableCronInput"> Weekdays:only </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-switch-when="weekly" ng-model="weekly">
+                <div class="row">
+                    <div class="form-group" ng-class="{'has-error': scheduleForm.scheduleFormRepeatWeeks.$dirty && scheduleForm.scheduleFormRepeatWeeks.$invalid}">
+                        <label for="scheduleFormRepeatWeeks" class="col-sm-3 control-label">Run every:</label>
+                        <div class="col-sm-3">
+                            <div>
+                                <input id="scheduleFormRepeatWeeks" name="scheduleFormRepeatWeeks" type="number" class="form-control" min="1" max="5" ng-model="scheduleTemplate.weekly.repeatWeeks" ng-required="!enableCronInput" style="width:100px;display:inline-block" ng-disabled="enableCronInput">
+                                <label for="scheduleFormRepeatWeeks" class="control-label">week(s)</label>
+                            </div>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show=" scheduleForm.scheduleFormRepeatWeeks.$dirty && scheduleForm.scheduleFormRepeatWeeks.$invalid">Enter weeks between 1-5</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group" ng-class="{'has-error': scheduleForm.scheduleRepeatDays.$dirty && scheduleForm.scheduleRepeatDays.$invalid}">
+                        <label for="scheduleRepeatDays" class="col-sm-3 control-label">On:</label>
+                        <div class="btn-group" style="margin-left:18px;">
+                            <label class="btn btn-default" ng-disabled="enableCronInput" ng-change="setDaysOfWeeks('MON',2,weekday.day2)" btn-checkbox ng-model="weekday.day2">
+                                Mon </label>
+                            <label class="btn btn-default" ng-disabled="enableCronInput" ng-change="setDaysOfWeeks('TUE',3,weekday.day3)" btn-checkbox ng-model="weekday.day3">
+                                Tues </label>
+                            <label class="btn btn-default" ng-disabled="enableCronInput" ng-change="setDaysOfWeeks('WED',4,weekday.day4)" btn-checkbox ng-model="weekday.day4">
+                                Wed </label>
+                            <label class="btn btn-default" ng-disabled="enableCronInput" ng-change="setDaysOfWeeks('THU',5,weekday.day5)" btn-checkbox ng-model="weekday.day5">
+                                Thur </label>
+                            <label class="btn btn-default" ng-disabled="enableCronInput" ng-change="setDaysOfWeeks('FRI',6,weekday.day6)" btn-checkbox ng-model="weekday.day6">
+                                Fri </label>
+                            <label class="btn btn-default" ng-disabled="enableCronInput" ng-change="setDaysOfWeeks('SAT',7,weekday.day7)" btn-checkbox ng-model="weekday.day7">
+                                Sat </label>
+                            <label class="btn btn-default" ng-disabled="enableCronInput" ng-change="setDaysOfWeeks('SUN',1,weekday.day1)" btn-checkbox ng-model="weekday.day1">
+                                Sun </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-switch-when="monthly" ng-model="monthly">
+                <div class="row">
+                    <div class="form-group" ng-class="{'has-error': scheduleForm.scheduleFormRepeatMonths.$dirty && scheduleForm.scheduleFormRepeatMonths.$invalid}">
+                        <label for="scheduleFormRepeatMonths" class="col-sm-3 control-label">Run every:</label>
+                        <div class="col-sm-3">
+                            <div>
+                                <input id="scheduleFormRepeatMonths" name="scheduleFormRepeatMonths" type="number" class="form-control" ng-model="scheduleTemplate.monthly.repeatMonths" min="1" ng-required="!enableCronInput" max="12" style="width:100px;display:inline-block" ng-disabled="enableCronInput">
+                                <label for="scheduleFormRepeatMonths" class="control-label">month(s)</label>
+                            </div>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show=" scheduleForm.scheduleFormRepeatMonths.$dirty && scheduleForm.scheduleFormRepeatMonths.$invalid">Enter months between 1-12</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group" ng-class="{'has-error': scheduleForm.scheduleRepeatOptions.$dirty && scheduleForm.scheduleRepeatOptions.$invalid}">
+                        <label for="scheduleRepeatOptions" class="col-sm-3 control-label">On:</label>
+                        <div class="col-sm-6">
+                            <select ng-model="scheduleTemplate.monthly.repeatOn" ng-options="opt.name as opt.name for opt in repeatOptions" ng-required="!enableCronInput" style="width:100px;display:inline-block" class="form-control" ng-disabled="enableCronInput">
+                            </select>
+                            <div style="display:inline-block" class="animate-switch-container" ng-switch on="scheduleTemplate.monthly.repeatOn">
+                                <div ng-switch-when="Day">
+                                    <input style="width:100px;" name="repeatDay" type="number" class="form-control" ng-model="scheduleTemplate.monthly.repeatDay" min="1" max="31" ng-required="!enableCronInput" ng-disabled="enableCronInput">
+                                    <span class="error" style="color: #a94442; font-size: 12px" ng-show=" scheduleForm.repeatDay.$dirty && scheduleForm.repeatDay.$error.maxlength">enter days between 1-31</span>
+                                </div>
+                                <div ng-switch-default ng-show="scheduleTemplate.monthly.repeatOn != 'Day'">
+                                    <select ng-model="scheduleTemplate.monthly.repeatDay" class="form-control" ng-options="opt.value as opt.name for opt in repeatMonthlyOptions" ng-required="!enableCronInput" style="width:130px;" ng-disabled="enableCronInput">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="row" collapse="enableCronInput">
+                <div style="margin-bottom: 15px" class="col-sm-4 col-sm-offset-4">
+                    <button ng-disabled="!scheduleForm.$valid" type="button" class="btn btn-info btn-block" ng-click="setSchedule()"><i class="fa fa-check fa-fw"></i> SET SCHEDULE</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group" ng-class="{'has-error': scheduleForm.scheduleCronInput.$dirty && scheduleForm.scheduleCronInput.$invalid}">
+                <label for="scheduleCronInput" class="col-sm-3 control-label">Cron:</label>
+                <div class="col-sm-6">
+                    <div class="input-group">
+					<span class="input-group-addon">
+					<input ng-model="enableCronInput" type="checkbox" ng-change="evaluateSelectedInputs()">
+					</span>
+                        <input type="text" class="form-control" id="scheduleCronInput" name="scheduleCronInput" ng-model="scheduleTemplate.cronString" ng-readonly="!enableCronInput" ng-required="enableCronInput" placeholder="5 0 * * *">
+                    </div>
+                    <span class="error" style="color: #a94442; font-size: 12px" ng-show="scheduleForm.scheduleCronInput.$dirty && scheduleForm.scheduleCronInput.$error.required">Required!</span>
+                </div>
+                <div class="col-sm-3">
+                    <button ng-show="enableCronInput" ng-disabled="!scheduleForm.$valid" type="button" class="btn btn-info" ng-click="setSchedule()"><i class="fa fa-check fa-fw"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <alert style="margin-top: 10px" ng-repeat="alert in scheduleAlerts" type="alert.type" close="closeScheduleAlert($index)">{{alert.msg}} </alert>
+            </div>
+        </div>
+    </ng-form>
+</div>

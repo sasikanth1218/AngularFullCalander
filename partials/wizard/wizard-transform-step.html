@@ -1,0 +1,152 @@
+<div data-ng-controller="wizardTransformStepController">
+    <div class="row" style="margin-top: 15px">
+        <form name="wizardTransformStepForm" class="form-horizontal" role="form">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-list fa-fw"></i>
+                        {{L.transformationRules}}
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-lg-12"
+                            data-ng-repeat="transformRule in transformRules"
+                            data-ng-form="ruleForm"
+                        >
+                            <div class="form-group">
+                                <label for="lstFunction{{$index + 1}}"
+                                    class="control-label col-sm-2"
+                                >
+                                    {{interpolate(L.ruleLabel, $index + 1)}}:
+                                </label>
+
+                                <div class="col-sm-4">
+                                    <select id="lstFunction{{$index + 1}}"
+                                        class="form-control col-sm-4"
+                                        data-ng-model="transformRule.functionID"
+                                        data-ng-options="function.id as function.name for function in savedState.selectableFunctions[$index]"
+                                        data-ng-change="onRuleSelectionEvent(this)"
+                                        required="required"
+                                    >
+                                        <option disabled value="">
+                                            {{savedState.defaultFunctionSelection}}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <button type="button"
+                                    class="btn btn-danger"
+                                    title="{{L.removeRule}}"
+                                    data-ng-click="removeTransformationRule($index)"
+                                >{{L.deleteRule}}</button>
+                            </div>
+
+                            <div data-ng-show="1 < savedState.viewDriver[$index].inputs.length">
+                                <label for="chkCollapseInputs{{$index}}">
+                                    <i class="fa"
+                                        data-ng-class="{'fa-minus': !savedState.viewDriver[$index].inputCollapsed, 'fa-plus': savedState.viewDriver[$index].inputCollapsed}"
+                                    ></i>
+                                    &nbsp;{{L.inputColumnsLabel}}
+                                </label>
+                                <input type="checkbox"
+                                    id="chkCollapseInputs{{$index}}"
+                                    name="chkCollapseInputs{{$index}}"
+                                    data-ng-model="savedState.viewDriver[$index].inputCollapsed"
+                                    data-ng-show="false"
+                                >
+                                <br style="clear: both;">
+                            </div>
+                            <div collapse="savedState.viewDriver[$index].inputCollapsed">
+                                <div class="form-group"
+                                    data-ng-repeat="inputField in savedState.viewDriver[$index].inputs"
+                                    data-ng-form="inputForm"
+                                >
+                                    <div
+                                        data-ng-class="{'has-error': inputForm.$dirty && !inputForm.lstInputColumn.$valid}"
+                                    >
+                                        <label for="lstInputColumn{{$index + 1}}"
+                                            class="control-label col-sm-3"
+                                        >
+                                            <span data-ng-show="inputField.isRequired"
+                                            >* </span>
+                                            {{interpolate(L.inputField, inputField.value)}}:
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <select id="lstInputColumn{{$index + 1}}"
+                                                name="lstInputColumn"
+                                                class="form-control"
+                                                data-ng-model="transformRule.inputs[$index].mappingRecordOrdinalPos"
+                                                data-ng-options="mapField.ordinalPos as mapField.headerName for mapField in savedState.viewDriver[$parent.$index].mappableFields[$index]"
+                                                data-ng-required="inputField.isRequired"
+                                                data-ng-change="onInputFieldSelectionEvent(this)"
+                                            >
+                                                <option value="">
+                                                    {{L.selectInputField}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-ng-show="1 < savedState.viewDriver[$index].outputs.length">
+                                <label for="chkCollapseOutputs{{$index}}">
+                                    <i class="fa"
+                                        data-ng-class="{'fa-minus': !savedState.viewDriver[$index].outputCollapsed, 'fa-plus': savedState.viewDriver[$index].outputCollapsed}"
+                                    ></i>
+                                    &nbsp;{{L.outputColumnsLabel}}
+                                </label>
+                                <input type="checkbox"
+                                    id="chkCollapseOutputs{{$index}}"
+                                    name="chkCollapseOutputs{{$index}}"
+                                    data-ng-model="savedState.viewDriver[$index].outputCollapsed"
+                                    data-ng-show="false"
+                                >
+                                <br style="clear: both;">
+                            </div>
+                            <div collapse="savedState.viewDriver[$index].outputCollapsed">
+                                <div class="form-group"
+                                    data-ng-repeat="outputField in savedState.viewDriver[$index].outputs"
+                                    data-ng-form="outputForm"
+                                    data-ng-class="{'has-error': !outputForm.$valid}"
+                                >
+                                    <label for="txtNewColumnName{{$index + 1}}"
+                                        class="control-label col-sm-3"
+                                    >
+                                        <span data-ng-show="outputField.isRequired"
+                                        >* </span>
+                                        {{interpolate(L.outputField, outputField.value)}}:
+                                    </label>
+                                    <div class="col-sm-4">
+                                        <input type="text"
+                                            id="txtNewColumnName{{$index + 1}}"
+                                            name="txtNewColumnName"
+                                            class="form-control"
+                                            style="margin: 0;"
+                                            maxlength="{{maxColumnNameLength}}"
+                                            data-ng-model="transformRule.outputs[$index].columnName"
+                                            data-ng-minlength="2"
+                                            data-ng-maxlength="{{maxColumnNameLength}}"
+                                            data-ng-pattern="/^(?!cdi)[0-9a-z]\w{1,32}$/i"
+                                            data-ng-required="outputField.isRequired"
+                                            data-ng-readonly="transformRule.outputs[$index].isStandardCdiFunction"
+                                        >
+                                    </div>
+                                    <span class="form-control-feedback"
+                                        data-ng-show="!outputForm.txtNewColumnName.$valid"
+                                    >{{L.invalidColumnName}}</span>
+                                </div>
+                            </div>
+                            <hr>
+                        </div>
+
+                        <button type="button"
+                            class="btn btn-info"
+                            data-ng-disabled="isBlocking()"
+                            data-ng-click="addNewTransformationRule()"
+                        >{{L.addRule}}</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

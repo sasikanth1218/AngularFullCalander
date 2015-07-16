@@ -1,0 +1,123 @@
+<div data-ng-controller="wizardStep5ReviewController">
+    <tabset justified="true">
+        <tab>
+            <tab-heading><i class="fa {{tab.icon}} fa-fw"></i> Job Details</tab-heading>
+            <div class="row">
+                <div class="col-lg-6">
+                    <h1>{{L.jobNameLabel}}: <small>{{jobConfig.name}}</small></h1>
+                    <h1 style="margin-top: -1%;">
+                        {{L.jobDescLabel}}: <small>{{jobConfig.description}}</small>
+                    </h1>
+                    <h1 style="margin-top: -1%;">
+                        {{L.feedLabel}}:
+                        <small>{{jobConfigTemplate.dlModule.feed.name}}</small>
+                    </h1>
+                    <h1 style="margin-top: -1%;">
+                        {{L.sizeLabel}}:
+                        <small>
+                            {{interpolate(L.sizeInBytes, jobConfigTemplate.dlModule.feed.fileSizeBytes)}}
+                        </small>
+                    </h1>
+                    <h1 style="margin-top: -1%;">
+                        {{L.mapToLabel}}:<br />
+                        <small style="margin-left: 20px;">
+                            {{L.mappingType}}: {{mappingType}}
+                        </small>
+                        <br />
+                        <small style="margin-left: 20px;">
+                            {{L.mappingDestination}}: {{mappingDest}}
+                        </small>
+                        <br />
+                        <small style="margin-left: 20px;">
+                            {{L.mappingBehavior}}: {{mappingBehavior}}
+                        </small>
+                        <br />
+                        <small style="margin-left: 20px;">
+                            {{L.loadType}}: {{loadType}}
+                        </small>
+                    </h1>
+                    <h1 style="margin-top: -1%;">{{L.notificationsLabel}}:<br>
+                        <small style="margin-left: 20px;">
+                            {{L.successNotifyLabel}}: {{jobConfigTemplate.successEmail}}
+                        </small>
+                        <br>
+                        <small style="margin-left: 20px;">
+                            {{L.failNotifyLabel}}: {{jobConfigTemplate.failureEmail}}
+                        </small>
+                    </h1>
+                </div>
+                <div class="col-lg-6">
+                    <h1>{{L.attributesLabel}}:</h1>
+                    <ul data-ng-repeat="attribute in moduleMap.LR.feeds[0].attributes">
+                        <li>
+                            <h1 style="margin-top: -1%;">
+                                <small>{{attribute.key}} = {{attribute.value}}</small>
+                            </h1>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <accordion close-others="true">
+                        <accordion-group is-open="reviewMappingAccordion.isOpen">
+                            <accordion-heading>
+                                {{L.mappingSectionHeader}}
+                                <div style="float: right">
+                                    <i class="fa"
+                                       data-ng-class="{'fa-minus': reviewMappingAccordion.isOpen, 'fa-plus': !reviewMappingAccordion.isOpen}"
+                                            ></i>
+                                </div>
+                            </accordion-heading>
+                            <div class="col-lg-6">
+                                <div class="list-group">
+                                    <a href="" class="list-group-item active">
+                                        {{L.destinationHeader}}: {{jobConfig.databaseTableConfig.name}}
+                                    </a>
+                                    <div data-ng-repeat="field in moduleMap.LR.feeds[1].fields">
+                                        <a href="" class="list-group-item">
+                                            <h4 class="list-group-item-heading">
+                                                <strong>
+                                                    <i class="fa fa-key fa-fw"
+                                                       data-ng-if="field.isKeyColumn"
+                                                            ></i> {{field.name}}
+                                                </strong>
+                                            </h4>
+                                            <p class="list-group-item-text">
+                                                <strong>{{L.dataTypeLabel}}:</strong>
+                                                {{field.dataType}}
+                                                <strong>{{ field.size ? ', ' + L.fieldSizeLabel + ': ' : '' }}</strong>
+                                                {{ field.size ? field.size : '' }}
+                                                <strong>{{ field.format ? ', ' + L.fieldFormatLabel + ': ' : '' }}</strong>
+                                                {{ field.format ? field.format : '' }}
+                                            </p>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </accordion-group>
+                    </accordion>
+                </div>
+            </div>
+        </tab>
+        <tab>
+            <tab-heading><i class="fa fa-fw"></i>JSON View</tab-heading>
+            <div class="row">
+                <div><pre>{{jobConfigJsonFormat}}</pre></div>
+            </div>
+        </tab>
+    </tabset>
+
+    <div class="row">
+        <div class="col-lg-12 wizardButtonBar">
+            <form name="wizardJobFormStep5" class="form-horizontal" role="form">
+                <input name="chkEnableCreate"
+                       type="checkbox"
+                       data-ng-model="enableCreate"
+                       data-ng-hide="true"
+                       required
+                        >
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,326 @@
+<div id="page-wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Hygiene</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-asterisk fa-fw"></i> Data Hygiene and Standardization - Real Time Services
+                </div>
+                <div class="panel-body">
+                    <!--<alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>-->
+
+                    <accordion close-others="true">
+                        <accordion-group is-open="true">
+                            <accordion-heading><i class="fa fa-envelope-o fa-fw"></i> Email</accordion-heading>
+                            <accordion-body>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <form role="form">
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Email Address</label>
+                                                <input type="text" class="form-control" id="exampleInputEmail1" ng-model="cHygiene.email" placeholder="sampleEmail@domain.com">
+                                            </div>
+                                            <button type="submit" ng-click="hygieneEmail(cHygiene)" class="btn btn-info">Cleanse and Validate</button>
+                                                <li ng-repeat="emailCleanse in cleansedEmails track by $index">
+                                                    <p></p>
+                                                <!--<a type="danger" ng-click="removeResultEmail($index, cleansedEmails)"><i class="fa fa-times"></i></a>-->
+                                                    <p> Original Email :  {{emailCleanse.originalEmail}} </p>
+                                                    <p> Cleansed Domain :  {{emailCleanse.cleansedDomain}} </p>
+                                                    <p> Cleansed Email :  {{emailCleanse.cleansedEmail}} </p>
+                                                    <p> Valid Email :  {{emailCleanse.validEmail}} </p>
+                                                </li>
+                                            </ul>
+                                           <!-- <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>-->
+                                        </form>
+                                    </div>
+                                    <div class="col-lg-6" style="text-align: right">
+                                        <h4>Examples:</h4>
+                                        <ul style="list-style-type: none;">
+                                            <li ng-click="cHygiene.email='james@yahooo.com'" onClick="document.getElementById('exampleInputEmail1').nodeValue='james@yahooo.com';"><a>james@yahooo.com</a></li>
+                                            <li ng-click="cHygiene.email='bob|smit.hy@gmail.com'" onClick="document.getElementById('exampleInputEmail1').value='bob|smit.hy@gmail.com';"><a>bob|smit.hy@gmail.com</a></li>
+                                            <li ng-click="cHygiene.email='ben.ferreiragmail.com'" onClick="document.getElementById('exampleInputEmail1').value='ben.ferreiragmail.com';"><a>ben.ferreiragmail.com</a></li>
+                                            <li ng-click="cHygiene.email='DELOREAN85@HOTMAIL.CON'" onClick="document.getElementById('exampleInputEmail1').value='DELOREAN85@HOTMAIL.CON';"><a>DELOREAN85@HOTMAIL.CON</a></li>
+                                            <li ng-click="cHygiene.email='montanadarci@hotmail.coom'" onClick="document.getElementById('exampleInputEmail1').value='montanadarci@hotmail.coom';"><a>montanadarci@hotmail.coom</a></li>
+                                            <li ng-click="cHygiene.email='princeGeorge@buckinghamPalace.co.uk'" onClick="document.getElementById('exampleInputEmail1').value='princeGeorge@buckinghamPalace.co.uk';"><a>princeGeorge@buckinghamPalace.co.uk</a></li>
+                                            <li ng-click="cHygiene.email='mlevine142@aol.com'" onClick="document.getElementById('exampleInputEmail1').value='mlevine142@aol.com';"><a>mlevine142@aol.com</a></li>
+                                            <li ng-click="cHygiene.email='dianaco_@hotmail.com'" onClick="document.getElementById('exampleInputEmail1').value='dianaco_@hotmail.com';"><a>dianaco_@hotmail.com</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div>
+                                </div>
+                            </accordion-body>
+                        </accordion-group>
+                        <accordion-group>
+                            <accordion-heading><i class="fa fa-phone fa-fw"></i> Phone</accordion-heading>
+                            <accordion-body>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <form role="form">
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Phone Number</label>
+                                                <input type="phone" class="form-control" id="phone" ng-model="cHygiene.phone" placeholder="555-666-7777">
+                                               <!-- <input type="" class="form-control" id="phone" placeholder="">-->
+                                            </div>
+                                            <!-- <button type="submit" class="btn btn-info">Cleanse and Validate</button>-->
+                                            <button type="submit" ng-click="hygienePhone(cHygiene)" class="btn btn-info">Cleanse and Validate</button>
+                                            <li ng-repeat="phoneCleanse in cleansedPhones track by $index">
+                                               <!-- <a type="danger" ng-click="removeResultPhone($index, cleansedPhones)"><i class="fa fa-times"></i></a>
+                                                {{phoneCleanse.original}} => {{phoneCleanse.cleansed}}-->
+                                                <p></p>
+                                                <p>Original Phone Number : {{phoneCleanse.originalPhoneNumber}}</p>
+                                                <p>Cleansed Extension : {{phoneCleanse.cleansedExtension}}</p>
+                                                <p>Cleansed Phone Number : {{phoneCleanse.cleansedPhoneNumber}}</p>
+                                                <p>Cleansed Phone Number Without Formatting : {{phoneCleanse.cleansedPhoneNumberWithoutFormatting}}</p>
+                                                <p>Valid Phone Number : {{phoneCleanse.validPhoneNumber}}</p>
+                                            </li>
+                                            </ul>
+                                        </form>
+                                    </div>
+                                    <div class="col-lg-6" style="text-align: right">
+                                        <h4>Examples:</h4>
+                                        <ul style="list-style-type: none;">
+                                            <li ng-click="cHygiene.phone='6046888850'" onClick="document.getElementById('phone').value='6046888850';"><a>6046888850</a></li>
+                                            <li ng-click="cHygiene.phone='+41 044 668 18 00'" onClick="document.getElementById('phone').value='+41 044 668 18 00';"><a>+41 044 668 18 00</a></li>
+                                            <li ng-click="cHygiene.phone='1-303 323.1522'" onClick="document.getElementById('phone').value='1-303 323.1522';"><a>1-303 323.1522</a></li>
+                                            <li ng-click="cHygiene.phone='604-688-8850'" onClick="document.getElementById('phone').value='604-688-8850';"><a>604-688-8850</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div>
+                                </div>
+                            </accordion-body>
+                        </accordion-group>
+                        <accordion-group>
+                            <accordion-heading><i class="fa fa-meh-o fa-fw"></i> Name</accordion-heading>
+                            <accordion-body>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <form role="form">
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Full Name</label>
+                                                <input type="name" class="form-control" id="name" ng-model="cHygiene.name" placeholder="John Smith">
+                                                <!--<input type="" class="form-control" id="name" placeholder="">-->
+                                            </div>
+                                            <!--<button type="submit" class="btn btn-info">Cleanse and Validate</button>-->
+                                            <button type="submit" ng-click="hygieneName(cHygiene)" class="btn btn-info">Cleanse and Validate</button>
+                                            <li ng-repeat="nameCleanse in cleansedNames track by $index">
+                                                <!--<a type="danger" ng-click="removeResultName($index, cleansedNames)"><i class="fa fa-times"></i></a>-->
+                                                <!--{{nameCleanse.original}} => {{nameCleanse.cleansed}}-->
+                                                <p></p>
+                                                <p>Cleansed Company Name: {{nameCleanse.cleansedCompanyName}}</p>
+                                                <p>Cleansed Full Name : {{nameCleanse.cleansedFullName}}</p>
+                                                <p>Cleansed First Name : {{nameCleanse.cleansedFirstName}}</p>
+                                                <p>Cleansed Last Name : {{nameCleanse.cleansedLastName}}</p>
+                                                <p>Cleansed Middle Name: {{nameCleanse.cleansedMiddleName}}</p>
+                                                <p>Cleansed Prefix : {{nameCleanse.cleansedPrefix}}</p>
+                                                <p>Cleansed Suffix : {{nameCleanse.cleansedSuffix}}</p>
+                                                <p>Company : {{nameCleanse.company}}</p>
+                                                <p>Vulgar : {{nameCleanse.vulgar}}</p>
+                                            </li>
+                                            </ul>
+                                        </form>
+                                    </div>
+                                    <div class="col-lg-6" style="text-align: right">
+                                        <h4>Examples:</h4>
+                                        <ul style="list-style-type: none;">
+                                            <li ng-click="cHygiene.name='JULIE HOWARD'" onClick="document.getElementById('name').value='JULIE HOWARD';"><a>JULIE HOWARD</a></li>
+                                            <li ng-click="cHygiene.name='Benjamin  Chow. Ferreira & '" onClick="document.getElementById('name').value='Benjamin  Chow. Ferreira & ';"><a>Benjamin  Chow. Ferreira & </a></li>
+                                            <li ng-click="cHygiene.name='JIMBO'" onClick="document.getElementById('name').value='JIMBO';"><a>JIMBO</a></li>
+                                            <li ng-click="cHygiene.name='Benjamin  George Mc Flannery'" onClick="document.getElementById('name').value='Benjamin  George Mc Flannery';"><a>Benjamin  George Mc Flannery</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div>
+                                </div>
+                            </accordion-body>
+                        </accordion-group>
+                        <accordion-group>
+                            <accordion-heading><i class="fa fa-arrows fa-fw"></i> Address</accordion-heading>
+                            <accordion-body>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <form role="form">
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Address 1</label>
+                                                <input type="" class="form-control" id="address1" ng-model="cHygiene.address1" placeholder="Address1">
+                                                <!--<input type="" class="form-control" id="address1" placeholder="">-->
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Address 2</label>
+                                                <input type="" class="form-control" id="address2" ng-model="cHygiene.address2" placeholder="address2">
+                                                <!--<input type="" class="form-control" id="address2" placeholder="">-->
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">City</label>
+                                                <input type="" class="form-control" id="city" ng-model="cHygiene.city" placeholder="city">
+                                                <!--<input type="" class="form-control" id="city" placeholder="">-->
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">State</label>
+                                                <input type="" class="form-control" id="state" ng-model="cHygiene.state" placeholder="state">
+                                                <!--<input type="" class="form-control" id="state" placeholder="">-->
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Zip</label>
+                                                <input type="" class="form-control" id="zipCode" ng-model="cHygiene.zip" placeholder="zip">
+                                              <!--  <input type="" class="form-control" id="zip" placeholder="">-->
+                                            </div>
+                                            <!--<button type="submit" class="btn btn-info">Cleanse and Validate</button>-->
+                                            <button type="submit" ng-click="hygieneAddress(cHygiene)" class="btn btn-info">Cleanse and Validate</button>
+                                            <li ng-repeat="addressCleanse in cleansedAddresses track by $index">
+                                                <!--<a type="danger" ng-click="removeResultAddress($index, cleansedAddresses)"><i class="fa fa-times"></i></a>-->
+                                                <!--{{addressCleanse.original}} => {{addressCleanse.cleansed}}-->
+                                                <p></p>
+                                                <p>Cleansed Address 1: {{addressCleanse.cleansedAddress1}}</p>
+                                                <p>Cleansed Address 2: {{addressCleanse.cleansedAddress2}}</p>
+                                                <p>Cleansed Address Type: {{addressCleanse.cleansedAddressType}}</p>
+                                                <p>Cleansed Address Type Desc: {{addressCleanse.cleansedAddressTypeDesc}}</p>
+                                                <p>Cleansed City: {{addressCleanse.cleansedCity}}</p>
+                                                <p>Cleansed Company Name: {{addressCleanse.cleansedCompanyName}}</p>
+                                                <p>Cleansed Country: {{addressCleanse.cleansedCountry}}</p>
+                                                <p>Cleansed Delivery Point Code: {{addressCleanse.cleansedDeliveryPointCode}}</p>
+                                                <p>Cleansed DPV Codes : {{addressCleanse.cleansedDPVCodes}}</p>
+                                                <p>Cleansed Postal Code: {{addressCleanse.cleansedPostalCode}}</p>
+                                                <p>Cleansed Postal Code 2: {{addressCleanse.cleansedPostalCode2}}</p>
+                                                <p>Cleansed Post Direction: {{addressCleanse.cleansedPostDirection}}</p>
+                                                <p>Cleansed Pre Direction: {{addressCleanse.cleansedPreDirection}}</p>
+                                                <p>Cleansed Region: {{addressCleanse.cleansedRegion}}</p>
+                                                <p>Cleansed Result Code: {{addressCleanse.cleansedResultCodes}}</p>
+                                                <p>Cleansed Status Code: {{addressCleanse.cleansedStatusCode}}</p>
+                                                <p>Cleansed Street Name: {{addressCleanse.cleansedStreetName}}</p>
+                                                <p>Cleansed Street Number: {{addressCleanse.cleansedStreetNumber}}</p>
+                                                <p>Cleansed Suffix: {{addressCleanse.cleansedSuffix}}</p>
+                                                <p>Cleansed Suite: {{addressCleanse.cleansedSuite}}</p>
+                                                <p>Cleansed Suite Number: {{addressCleanse.cleansedSuiteNumber}}</p>
+                                                <p>Cleansed Suite Type: {{addressCleanse.cleansedSuiteType}}</p>
+                                                <p>Deliverable: {{addressCleanse.deliverable}}</p>
+                                            </li>
+                                            </ul>
+                                        </form>
+                                    </div>
+                                    <div class="col-lg-6" style="text-align: right">
+                                        <h4>Examples:</h4>
+                                        <ul style="list-style-type: none;">
+                                            <li ng-click="  cHygiene.address1='1125 17th Street Suite 1550';
+                                                            cHygiene.city='Denver';
+                                                            cHygiene.zip='80202';
+                                                            cHygiene.state='CO'"
+                                                onClick="   document.getElementById('address1').value='1125 17th Street Suite 1550';
+                                                            document.getElementById('city').value='Denver';
+                                                            document.getElementById('state').value='CO';
+                                                            document.getElementById('zipCode').value='80202';"
+                                                ><a>1125 17th Street Suite 1550 Denver CO 80202</a></li>
+                                        </ul>
+                                        <ul style="list-style-type: none;">
+                                        <li ng-click="  cHygiene.address1='3131 Las Vegas Boulevard South';
+                                                        cHygiene.city='Las Vegas';
+                                                        cHygiene.zip='89109-1967';
+                                                        cHygiene.state='Nevada'"
+                                            onClick="   document.getElementById('address1').value='3131 Las Vegas Boulevard South';
+                                                        document.getElementById('city').value='Las Vegas';
+                                                        document.getElementById('state').value='Nevada';
+                                                        document.getElementById('zipCode').value='89109-1967';"
+                                                ><a>3131 Las Vegas Boulevard South Las Vegas Nevada 89109-1967</a></li>
+                                        </ul>
+                                        <ul style="list-style-type: none;">
+                                            <li ng-click="  cHygiene.address1='4676 MacArthur Lane';
+                                                            cHygiene.city='Boulder';
+                                                            cHygiene.zip='80303';
+                                                            cHygiene.state='Colorado';"
+                                                onClick="   document.getElementById('address1').value='4676 MacArthur Lane';
+                                                            document.getElementById('city').value='Boulder';
+                                                            document.getElementById('state').value='Colorado';
+                                                            document.getElementById('zipCode').value='80303';"
+                                                    ><a>4676 MacArthur Lane Boulder Colorado 80303</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div>
+                                </div>
+                            </accordion-body>
+                        </accordion-group>
+                        <accordion-group>
+                            <accordion-heading><i class="fa fa-map-marker fa-fw"></i> Geocoding</accordion-heading>
+                            <accordion-body>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <form role="form">
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Zip</label>
+                                                <!--<input type="" class="form-control" id="zip" placeholder="">-->
+                                                <input type="" class="form-control" id="geoZip" ng-model="cHygiene.geoCode" placeholder="12345">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail1">Zip +4</label>
+                                                <input type="" class="form-control" id="geoZipFour" ng-model="cHygiene.geoPlus4" placeholder="6789">
+                                                <!--<input type="" class="form-control" id="zip4" placeholder="">-->
+                                            </div>
+                                          <!--  <button type="submit" class="btn btn-info">Cleanse and Validate</button>-->
+                                            <button type="submit" ng-click="hygieneGeo(cHygiene)" class="btn btn-info">Cleanse and Validate</button>
+                                            <li ng-repeat="geoCleanse in cleansedGeo track by $index">
+                                                <!--<a type="danger" ng-click="removeResultGeo($index, cleansedAddresses)"><i class="fa fa-times"></i></a>-->
+                                                <p></p>
+                                                <p>Census Block: {{geoCleanse.censusBlock}}</p>
+                                                <p>Census Tract: {{geoCleanse.censusTract}}</p>
+                                                <p>County Fips: {{geoCleanse.countyFips}}</p>
+                                                <p>County Name: {{geoCleanse.countyName}}</p>
+                                                <p>Error Code: {{geoCleanse.errorCode}}</p>
+                                                <p>Latitude: {{geoCleanse.latitude}}</p>
+                                                <p>Longitude: {{geoCleanse.longitude}}</p>
+                                                <p>Place Code: {{geoCleanse.placeCode}}</p>
+                                                <p>Place Name: {{geoCleanse.placeName}}</p>
+                                                <p>Result Code: {{geoCleanse.resultCode}}</p>
+                                                <p>Result Code Description: {{geoCleanse.resultCodeDescription}}</p>
+                                                <p>Status Code: {{geoCleanse.statusCode}}</p>
+                                                <p>Time Zone: {{geoCleanse.timeZone}}</p>
+                                                <p>Time Zone Code: {{geoCleanse.timeZoneCode}}</p>
+                                            </li>
+                                        </form>
+                                    </div>
+                                    <div class="col-lg-6" style="text-align: right">
+                                        <h4>Examples:</h4>
+                                        <ul style="list-style-type: none;">
+                                            <ul style="list-style-type: none;">
+                                                <li ng-click="  cHygiene.geoCode='80005';
+                                                                cHygiene.geoPlus4='3009';"
+                                                    onClick="   document.getElementById('geoZip').value='80005';
+                                                                document.getElementById('geoZipFour').value='3009';"
+                                                        ><a>80005-3009</a></li>
+                                            </ul>
+                                            <ul style="list-style-type: none;">
+                                                <li ng-click="  cHygiene.geoCode='80005';
+                                                                cHygiene.geoPlus4='';"
+                                                    onClick="document.getElementById('geoZip').value='80005';"
+                                                        ><a>80005</a></li>
+                                            </ul>
+                                            <ul style="list-style-type: none;">
+                                                <li ng-click="  cHygiene.geoCode='800053009';
+                                                                cHygiene.geoPlus4='';"
+                                                    onClick="document.getElementById('geoZip').value='800053009';"
+                                                        ><a>800053009</a></li>
+                                            </ul>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div>
+                                </div>
+                            </accordion-body>
+                        </accordion-group>
+                        <accordion-group>
+                            <accordion-heading><i class="fa fa-exclamation fa-fw"></i> Vulgarity</accordion-heading>
+                            <accordion-body>
+                                <alert ng-repeat="message in messages" type="message.type">{{message.msg}}</alert>
+                            </accordion-body>
+                        </accordion-group>
+                    </accordion>
+                </div>
+            </div>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+</div>

@@ -1,0 +1,101 @@
+<style>
+    .fa-sort-asc{
+        color : #333333;
+    }
+    .fa-sort-desc{
+        color : #333333;
+    }
+    .fa-sort{
+        color : #BBBBBB;
+    }
+</style>
+<div id="page-wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Jobs > {{job.id}} > Executions</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-play-circle fa-fw"></i> Job Executions
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12"> <!--row above -->
+                            <h4>Click on the view icon to drill into an execution</h4>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-lg-12" style="overflow: auto">
+                            <table class="table table-striped table-hover" id="tableExecutions">
+                                <thead>
+                                <tr>
+                                    <th data-ng-click="order('id')">ID
+                                        <i class="fa fa-fw fa-sort" ng-show="'id' !== orderColumn"></i>
+                                            <i class="fa fa-fw fa-sort-asc" data-ng-show="'id' == orderColumn && 'asc' == orderDirection"></i>
+                                            <i class="fa fa-fw fa-sort-desc" data-ng-show="'id' == orderColumn && 'asc' != orderDirection"></i>
+                                    </th>
+                                    <th data-ng-click="order('executedJob')">JOB
+                                        <i class="fa fa-fw fa-sort" ng-show="'executedJob' !== orderColumn"></i>
+                                            <i class="fa fa-fw fa-sort-asc" data-ng-show="'executedJob' == orderColumn && 'asc' == orderDirection"></i>
+                                            <i class="fa fa-fw fa-sort-desc" data-ng-show="'executedJob' == orderColumn && 'asc' != orderDirection"></i>
+
+                                    </th>
+                                    <th data-ng-click="order('executedJobId')">JOB ID
+                                        <i class="fa fa-fw fa-sort" ng-show="'executedJobId' !== orderColumn"></i>
+                                            <i class="fa fa-fw fa-sort-asc" data-ng-show="'executedJobId' == orderColumn && 'asc' == orderDirection"></i>
+                                            <i class="fa fa-fw fa-sort-desc" data-ng-show="'executedJobId' == orderColumn && 'asc' != orderDirection"></i>
+
+                                    </th>
+                                    <th>STATUS</th>
+                                    <th>STATUS MESSAGE</th>
+                                    <th data-ng-click="order('start')">START
+                                        <i class="fa fa-fw fa-sort" ng-show="'start' !== orderColumn"></i>
+                                            <i class="fa fa-fw fa-sort-asc" data-ng-show="'start' == orderColumn && 'asc' == orderDirection"></i>
+                                            <i class="fa fa-fw fa-sort-desc" data-ng-show="'start' == orderColumn && 'asc' != orderDirection"></i>
+
+                                    </th>
+                                    <th data-ng-click="order('end')">END
+                                        <i class="fa fa-fw fa-sort" ng-show="'end' !== orderColumn"></i>
+                                            <i class="fa fa-fw fa-sort-asc" data-ng-show="'end' == orderColumn && 'asc' == orderDirection"></i>
+                                            <i class="fa fa-fw fa-sort-desc" data-ng-show="'end' == orderColumn && 'asc' != orderDirection"></i>
+
+                                    </th>
+                                    <th>ELAPSED</th>
+                                    <th>TOTAL</th>
+                                    <th>PROCESSED</th>
+                                    <th>REJECTED</th>
+                                    <th>&nbsp;</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr data-ng-repeat="execution in executions" data-ng-style="executionRecordStyle(execution.status)">
+                                    <td class="numericData">{{execution.id}}</td>
+                                    <td class="textData">{{execution.executedJob}}</td>
+                                    <td class="numericData">{{execution.executedJobId}}</td>
+                                    <td class="textData">{{execution.status}}</td>
+                                    <td class="rawData">{{execution.statusCode}} - {{execution.statusMessage}}</td>
+                                    <td class="timeData">{{execution.start}}</td>
+                                    <td class="timeData">{{execution.end}}</td>
+                                    <td class="numericData">{{execution.elapsed}}</td>
+                                    <td class="numericData">{{execution.total}}</td>
+                                    <td class="numericData">{{execution.processed}}</td>
+                                    <td class="numericData">{{execution.rejected}}</td>
+                                    <td class="rowControls">
+                                        <a href="#!jobs/{{execution.executedJobId}}/executions/{{execution.id}}" title="View Execution" class="btn btn-info" data-ng-disabled="{{!user.authorities.EXECUTIONS[0]}}">
+                                            <i class="fa fa-search"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

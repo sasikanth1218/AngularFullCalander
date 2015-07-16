@@ -1,0 +1,91 @@
+<!--
+
+  THIS FILE IS UNDER PUPPET CONTROL!
+  Do not modify this file.  Your modifications will be overwritten the next
+  time Puppet runs on this host.  If you are certain that modification is
+  needed, you must update the template for this file in the cdi_app
+  Puppet module to make your modification permanent.
+
+-->
+
+<!-- Bootstrap -->
+<link href="css/bootstrap.min.css" rel="stylesheet">
+
+<!-- FICO Styling -->
+<link href="css/fonts.css" rel="stylesheet">
+<link href="css/fico.css" rel="stylesheet">
+<link href="css/cdi.css" rel="stylesheet">
+<link href="css/cdi-theme-fico.css" rel="stylesheet">
+
+	<!-- Themes
+		<link href="css/cdi-theme-fico.css" rel="stylesheet">
+		<link href="css/cdi-theme-ebay.css" rel="stylesheet">
+		<link href="css/cdi-theme-embedded.css" rel="stylesheet">
+	-->
+
+<div class="login-background">
+	<div class="login-container">
+		<div class="logo-container">
+			<div class="login-logo"></div>
+		</div>
+        <div class="login-content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                        <form>
+                            <p class="logon_text">&nbsp;</p>
+<!-- Disabling except for development/translation testing
+                            <label for="lstLanguage">{{L.language}}</label><br>
+                            <select id="lstLanguage"
+                                class="form-control"
+                                style="margin-bottom: 12px;"
+                                data-ng-model="languageID"
+                                data-ng-options="language.id as language.name for language in languages"
+                                data-ng-change="changeLanguage(languageID)"
+                                data-ng-disabled="(2 > languages.length)"
+                            ></select>
+-->
+                            <label for="username">{{L.userName}}</label><br>
+                            <input id="username"
+                                type="text"
+                                class="form-control"
+                                style="height: 35px !important;"
+                                data-ng-model="user.name"
+                                placeholder="{{L.userName}}"
+                                autofocus
+                            >
+
+                            <label for="password">{{L.password}}</label><br>
+                            <input id="password"
+                                type="password"
+                                class="form-control"
+                                style="height: 35px !important;"
+                                data-ng-model="user.password"
+                                placeholder="{{L.password}}"
+                                value=""
+                            >
+
+                            <div class="dataContainer indent pull-right">
+                                <div class="data">
+									<input type="submit"
+                                        class="btn btn-large btn-info"
+                                        value="Log in"
+                                        data-ng-click="login()">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+					<div class="col-md-5">
+						<alert data-ng-repeat="alert in alerts"
+                            type="alert.type"
+                            close="closeAlert($index)"
+                        >{{alert.msg}}</alert>
+					</div>
+                </div>
+                <div id="copyright" style="color:#888; font-size: 10px;">
+                    {{interpolate(L.copyrightNotice, currentYear, L.manufacturerName, L.allRightsReserved)}}
+                </div>
+            </div>
+        </div>
+	</div>
+</div>

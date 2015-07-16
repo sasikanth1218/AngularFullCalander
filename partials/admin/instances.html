@@ -1,0 +1,1204 @@
+<div class="row" style="margin-top: 10px;">
+    <div class="col-lg-12">
+        <alert ng-repeat="iAlert in instanceAlerts" type="iAlert.type" close="closeInstanceAlert($index)">
+            {{iAlert.msg}}
+        </alert>
+        <span us-spinner spinner-key="spinner-1"></span>
+        <accordion close-others="true">
+            <accordion-group is-open="instanceAccordionCreate.isOpen">
+                <accordion-heading>
+                    <i class="fa"
+                       ng-class="{'fa-angle-down': instanceAccordionCreate.isOpen, 'fa-angle-right': !instanceAccordionCreate.isOpen}"></i>
+                    Create a New Instance
+                </accordion-heading>
+                <form name="adminCreateInstance" class="form-horizontal" role="form">
+                    <div class="col-lg-6">
+                        <h4>Instance Definition</h4>
+
+                        <div class="form-group"
+                             ng-class="{'has-error': adminCreateInstance.instanceName.$dirty && adminCreateInstance.instanceName.$invalid}">
+                            <label for="instanceName" class="col-sm-2 control-label">Name</label>
+
+                            <div class="col-sm-8">
+                                <input id="instanceName" name="instanceName" type="text" class="form-control"
+                                       ng-model="cInstance.name" required ng-minlength="3" ng-maxlength="255">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstance.instanceName.$dirty && adminCreateInstance.instanceName.$error.required">Instance name is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstance.instanceName.$dirty && adminCreateInstance.instanceName.$error.minlength">Instance name must be at least 2 characters!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstance.instanceName.$dirty && adminCreateInstance.instanceName.$error.maxlength">Instance name cannot be greater than 255 characters!</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminCreateInstance.instanceDescription.$dirty && adminCreateInstance.instanceDescription.$invalid}">
+                            <label for="instanceDescription" class="col-sm-2 control-label">Description</label>
+
+                            <div class="col-sm-8">
+                                <input id="instanceDescription" name="instanceDescription" type="text"
+                                       class="form-control" ng-model="cInstance.description" required
+                                       ng-maxlength="255">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstance.instanceDescription.$dirty && adminCreateInstance.instanceDescription.$error.required">Instance description is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstance.instanceDescription.$dirty && adminCreateInstance.instanceDescription.$error.maxlength">Instance description cannot be greater than 255 characters!</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminCreateInstance.appClientId.$dirty && adminCreateInstance.appClientId.$invalid}">
+                            <label for="createAppClientId" class="col-sm-2 control-label">App Client Id</label>
+
+                            <div class="col-sm-8">
+                                <input id="appClientId" name="appClientId" type="text" class="form-control"
+                                       ng-model="cInstance.appClientId" ng-required="!appClientIdOverrideClicked"
+                                       ng-minlength="1" ng-maxlength="6" ng-disabled="appClientIdOverrideClicked"
+                                       onkeypress="if(this.value.match(/\D/)) this.value=this.value.replace(/\D/g,'')"
+                                       onkeyup="if(this.value.match(/\D/)) this.value=this.value.replace(/\D/g,'')">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstance.appClientId.$dirty && adminCreateInstance.appClientId.$error.required">AppClientId is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstance.appClientId.$dirty && adminCreateInstance.appClientId.$error.minlength">AppClientId must be at least 1 characters!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstance.appClientId.$dirty && adminCreateInstance.appClientId.$error.maxlength">AppClientId cannot be greater than 6 characters!</span>
+
+                                <div></div>
+                                <input id="appClientIdOverrideCheckbox" ng-model="appClientIdOverrideClicked"
+                                       ng-change="checkAppClient($index)" type="checkbox">
+                                <label tooltip="Checking the box should disable the app client id text">Override App
+                                    Client Id</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <h4>Instance Attributes</h4>
+
+                        <div class="form-group"
+                             ng-class="{'has-error': adminCreateInstance.instanceConnectionCSchema.$dirty && adminCreateInstance.instanceConnectionCSchema.$invalid}">
+                            <label for="instanceConnectionCSchema" class="col-sm-2 control-label">Schema</label>
+
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" placeholder="Schema"
+                                       ng-change="schemaChanged(instanceConnectionCSchema)"
+                                       name="instanceConnectionCSchema" id="instanceConnectionCSchema"
+                                       ng-model="instanceConnectionCSchema" ng-trim="false"
+                                       ng-pattern="/^[A-Za-z0-9][A-Za-z0-9_-]+$/" required/>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstance.instanceConnectionCSchema.$dirty && adminCreateInstance.instanceConnectionCSchema.$error.required">Schema is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstance.instanceConnectionCSchema.$dirty && adminCreateInstance.instanceConnectionCSchema.$error.pattern">Schema should only contain alpha-numeric characters, dashes and underscores!</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <h4>Customer Identification</h4>
+
+                        <div class="form-group">
+                            <select ng-model="selected" class="form-control" ng-change="changedCustomerOption(selected)"
+                                    ng-options="opt.value as opt.name for opt in customerOptions" required>
+                                <option value="">Customer Identifier Select Box</option>
+                            </select>
+
+                            <div ng-hide="true">
+                                <tt>selected={{selected}}</tt>
+                            </div>
+                            <hr/>
+                            <div class="animate-switch-container" ng-switch on="selected">
+                                <div ng-switch-when="contact.email" ng-model="contact.email">
+                                    <div class="col-lg-12">
+                                        <div class="alert alert-info" role="alert">
+                                            <a href="#" class="close" data-dismiss="alert">&times;</a>Please note, once
+                                            a customer identifier has been provisioned for an instance (organization) it
+                                            cannot be changed.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-switch-when="uuid" ng-model="uuid">
+                                    <div class="col-lg-12">
+                                        <div class="alert alert-info" role="alert">
+                                            <a href="#" class="close" data-dismiss="alert">&times;</a>Please note, once
+                                            a customer identifier has been provisioned for an instance (organization) it
+                                            cannot be changed.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-switch-when="account_number" ng-model="account_number">
+                                    <div class="col-lg-12">
+                                        <div class="alert alert-info" role="alert">
+                                            <a href="#" class="close" data-dismiss="alert">&times;</a>Please note, once
+                                            a customer identifier has been provisioned for an instance (organization) it
+                                            cannot be changed.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-switch-when="adv" ng-model="adv">
+                                    <div class="col-lg-12">
+                                        <div class="alert alert-danger" role="alert">
+                                            <a href="#" class="close" data-dismiss="alert">&times;</a>Please note, once
+                                            a customer identifier has been provisioned for an instance (organization) it
+                                            cannot be changed.
+                                        </div>
+                                        <accordion close-others="false">
+                                            <accordion-group is-open="instanceCreateCustomerIdentifierAdvanced.isOpen">
+                                                <accordion-heading>
+                                                    <i class="fa"
+                                                       ng-class="{'fa-angle-down': instanceCreateCustomerIdentifierAdvanced.isOpen, 'fa-angle-right': !instanceCreateCustomerIdentifierAdvanced.isOpen}"></i>
+                                                    Advanced
+                                                </accordion-heading>
+                                                <h4> Customer Identifier(s)</h4>
+                                                <accordion-group is-open="instanceCreateAccordionCustomerKey.isOpen">
+                                                    <accordion-heading>
+                                                        <i class="fa"
+                                                           ng-class="{'fa-angle-down': instanceCreateAccordionCustomerKey.isOpen, 'fa-angle-right': !instanceCreateAccordionCustomerKey.isOpen}"></i>
+                                                        Customer Key
+                                                    </accordion-heading>
+
+                                                    <div style="width:auto;">
+                                                        <div class="form-horizontal">
+                                                            <div class="form-group"
+                                                                 ng-class="{'has-error': adminCreateInstance.instanceCustomerKeyName.$dirty && adminCreateInstance.instanceCustomerKeyName.$invalid}">
+                                                                <label for="instanceCustomerKeyName"
+                                                                       class="col-sm-2 control-label">Name</label>
+
+                                                                <div class="col-sm-8">
+                                                                    <input id="instanceCustomerKeyName"
+                                                                           name="instanceCustomerKeyName" type="text"
+                                                                           class="form-control"
+                                                                           ng-model="cInstance.customerKeys[0].name"
+                                                                           placeholder="Customer Key Name">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group"
+                                                                 ng-class="{'has-error': adminCreateInstance.instanceCustomerKeyDataType.$dirty && adminCreateInstance.instanceCustomerKeyDataType.$invalid}">
+                                                                <label for="instanceCustomerKeyDataType"
+                                                                       class="col-sm-2 control-label">Data Type
+                                                                </label>
+
+                                                                <div class="col-sm-8">
+                                                                    <select class="form-control"
+                                                                            ng-model="cInstance.customerKeys[0].dataType"
+                                                                            ng-options="dataType.name as dataType.name for dataType in custDataTypes">
+                                                                        <option value="">Select a DataType</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group"
+                                                                 ng-class="{'has-error': adminCreateInstance.instanceCustomerKeySize.$dirty && adminCreateInstance.instanceCustomerKeySize.$invalid}">
+                                                                <label for="instanceCustomerKeySize"
+                                                                       class="col-sm-2 control-label">Size</label>
+
+                                                                <div class="col-sm-8">
+                                                                    <input id="instanceCustomerKeySize"
+                                                                           name="instanceCustomerKeySize" type="text"
+                                                                           class="form-control"
+                                                                           ng-readonly="cInstance.customerKeys[0].dataType =='INTEGER'"
+                                                                           ng-model="cInstance.customerKeys[0].size">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="form-group" ng-show="hide"
+                                                                 ng-class="{'has-error': adminCreateInstance.instanceCustomerKeyOP.$dirty && adminCreateInstance.instanceCustomerKeyOP.$invalid}">
+                                                                <label for="instanceCustomerKeyOP"
+                                                                       class="col-sm-2 control-label">Ordinal Position
+                                                                </label>
+
+                                                                <div class="col-sm-8">
+                                                                    <input id="instanceCustomerKeyOP"
+                                                                           name="instanceCustomerKeyOP" type="text"
+                                                                           class="form-control"
+                                                                           ng-model="cInstance.customerKeys[0].ordinalPos">
+                                                                </div>
+                                                            </div>
+                                                            <button type="button" class="btn pull-right btn-primary"
+                                                                    ng-click="addNewCustomerKeys()">Add +
+                                                            </button>
+                                                        </div>
+                                                        <div class="form-group"
+                                                             ng-repeat="customerKey2 in cInstance.customerKeys | limitTo:5 track by $index">
+                                                            <div style="width:auto;" ng-if="$index > 0">
+                                                                <div class="col-lg-12">
+                                                                    <div class="alert alert-info" role="alert">
+                                                                        <a href="#" class="close"
+                                                                           data-dismiss="alert">&times;</a>Add New
+                                                                        Customer Key
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-horizontal">
+                                                                    <div class="form-group"
+                                                                         ng-class="{'has-error': adminCreateInstance.instanceCustomerKeyNameTwo.$dirty && adminCreateInstance.instanceCustomerKeyNameTwo.$invalid}">
+                                                                        <label for="instanceCustomerKeyNameTwo"
+                                                                               class="col-sm-2 control-label">Name</label>
+
+                                                                        <div class="col-sm-8">
+                                                                            <input id="instanceCustomerKeyNameTwo"
+                                                                                   name="instanceCustomerKeyNameTwo"
+                                                                                   type="text" class="form-control"
+                                                                                   ng-model="customerKey2.name"
+                                                                                   placeholder="Customer Key Name">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group"
+                                                                         ng-class="{'has-error': adminCreateInstance.instanceCustomerKeyDataTypeTwo.$dirty && adminCreateInstance.instanceCustomerKeyDataTypeTwo.$invalid}">
+                                                                        <label for="instanceCustomerKeyDataTypeTwo"
+                                                                               class="col-sm-2 control-label">Data Type
+                                                                        </label>
+
+                                                                        <div class="col-sm-8">
+                                                                            <select class="form-control"
+                                                                                    ng-model="customerKey2.dataType"
+                                                                                    ng-options="dataType.name as dataType.name for dataType in custDataTypes">
+                                                                                <option value="">Select a DataType
+                                                                                </option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group"
+                                                                         ng-class="{'has-error': adminCreateInstance.instanceCustomerKeySizeTwo.$dirty && adminCreateInstance.instanceCustomerKeySizeTwo.$invalid}">
+                                                                        <label for="instanceCustomerKeySizeTwo"
+                                                                               class="col-sm-2 control-label">Size</label>
+
+                                                                        <div class="col-sm-8">
+                                                                            <input id="instanceCustomerKeySizeTwo"
+                                                                                   name="instanceCustomerKeySizeTwo"
+                                                                                   ng-disabled="customerKey2.dataType =='INTEGER'"
+                                                                                   type="text" class="form-control"
+                                                                                   ng-model="customerKey2.size">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group" ng-show="hide"
+                                                                         ng-class="{'has-error': adminCreateInstance.instanceCustomerKeyOPTwo.$dirty && adminCreateInstance.instanceCustomerKeyOPTwo.$invalid}">
+                                                                        <label for="instanceCustomerKeyOPTwo"
+                                                                               class="col-sm-2 control-label">Ordinal
+                                                                            Position
+                                                                        </label>
+
+                                                                        <div class="col-sm-8">
+                                                                            <input id="instanceCustomerKeyOPTwo"
+                                                                                   name="instanceCustomerKeyOPTwo"
+                                                                                   type="text" class="form-control"
+                                                                                   ng-model="customerKey2.ordinalPos">
+                                                                        </div>
+                                                                    </div>
+                                                                    <button type="button"
+                                                                            class="pull-right btn btn-danger"
+                                                                            style="margin-right:15px;"
+                                                                            ng-click="removeSubCustomerkey($index)">
+                                                                        Remove
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </accordion-group>
+                                                <div style="width:auto;">
+                                                    <h4>Connections </h4>
+                                                    <accordion-group is-open="instanceAccordionAddConnection.isOpen">
+                                                        <accordion-heading>
+                                                            <i class="fa"
+                                                               ng-class="{'fa-angle-down': instanceAccordionAddConnection.isOpen, 'fa-angle-right': !instanceAccordionAddConnection.isOpen}"></i><span
+                                                                data-tooltip="Please create 1 or more connections"> Add Instance Connection </span>
+                                                        </accordion-heading>
+                                                        <div class="form-horizontal">
+                                                            <div class="form-group">
+                                                                <label class="col-sm-2 control-label">Connection Type
+                                                                </label>
+
+                                                                <div class="col-sm-6">
+                                                                    <select class="form-control"
+                                                                            ng-model="cInstance.connections[0].type"
+                                                                            ng-options="connType.name as connType.name for connType in connectionTypes"
+                                                                            ng-change="changedConnectionType(cInstance.connections[0])">
+                                                                        <option value="">Select a Connection Type
+                                                                        </option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group"
+                                                                 ng-class="{'has-error': adminCreateInstance.adminCreateInstanceConnectionName.$dirty && adminCreateInstance.adminCreateInstanceConnectionName.$invalid}">
+                                                                <label for="instanceName"
+                                                                       class="col-sm-2 control-label">Name</label>
+
+                                                                <div class="col-sm-6">
+                                                                    <input id="adminCreateInstanceConnectionName"
+                                                                           name="adminCreateInstanceConnectionName"
+                                                                           type="text" class="form-control"
+                                                                           ng-model="cInstance.connections[0].name"
+                                                                           required ng-minlength="2" ng-maxlength="255">
+                                                                    <span class="error"
+                                                                          style="color: #a94442; font-size: 12px"
+                                                                          ng-show="adminCreateInstance.adminCreateInstanceConnectionName.$dirty && adminCreateInstance.adminCreateInstanceConnectionName.$error.required">Connection name is required!</span>
+                                                                    <span class="error"
+                                                                          style="color: #a94442; font-size: 12px"
+                                                                          ng-show="adminCreateInstance.adminCreateInstanceConnectionName.$dirty && adminCreateInstance.adminCreateInstanceConnectionName.$error.minlength">Connection name must be at least 2 characters!</span>
+                                                                    <span class="error"
+                                                                          style="color: #a94442; font-size: 12px"
+                                                                          ng-show="adminCreateInstance.adminCreateInstanceConnectionName.$dirty && adminCreateInstance.adminCreateInstanceConnectionName.$error.maxlength">Connection name cannot be greater than 255 characters!</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group"
+                                                                 ng-class="{'has-error': adminCreateInstance.adminCreateInstanceConnectionDescription.$dirty && adminCreateInstance.adminCreateInstanceConnectionDescription.$invalid}">
+                                                                <label for="instanceName"
+                                                                       class="col-sm-2 control-label">Description</label>
+
+                                                                <div class="col-sm-6">
+                                                                    <input id="adminCreateInstanceConnectionDescription"
+                                                                           name="adminCreateInstanceConnectionDescription"
+                                                                           type="text" class="form-control"
+                                                                           ng-model="cInstance.connections[0].description"
+                                                                           ng-maxlength="255">
+                                                                    <span class="error"
+                                                                          style="color: #a94442; font-size: 12px"
+                                                                          ng-show="adminCreateInstance.adminCreateInstanceConnectionDescription.$dirty && adminCreateInstance.adminCreateInstanceConnectionDescription.$error.maxlength">Connection description cannot be greater than 255 characters!</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group"
+                                                                 ng-class="{'has-error': adminCreateInstance.adminCreateInstanceConnectionHostname.$dirty && adminCreateInstance.adminCreateInstanceConnectionHostname.$invalid}">
+                                                                <label for="adminCreateInstanceConnectionHostname"
+                                                                       class="col-sm-2 control-label">Hostname</label>
+
+                                                                <div class="col-sm-6">
+                                                                    <input id="adminCreateInstanceConnectionHostname"
+                                                                           name="adminCreateInstanceConnectionHostname"
+                                                                           type="text" class="form-control"
+                                                                           ng-model="cInstance.connections[0].hostname"
+                                                                           required ng-maxlength="255">
+                                                                    <span class="error"
+                                                                          style="color: #a94442; font-size: 12px"
+                                                                          ng-show="adminCreateInstance.adminCreateInstanceConnectionHostname.$dirty && adminCreateInstance.adminCreateInstanceConnectionHostname.$error.required">Hostname is required!</span>
+                                                                    <span class="error"
+                                                                          style="color: #a94442; font-size: 12px"
+                                                                          ng-show="adminCreateInstance.adminCreateInstanceConnectionHostname.$dirty && adminCreateInstance.adminCreateInstanceConnectionHostname.$error.maxlength">Hostname cannot be greater than 255 characters!</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group"
+                                                                 ng-class="{'has-error': adminCreateInstance.adminCreateInstanceConnectionPort.$dirty && adminCreateInstance.adminCreateInstanceConnectionPort.$invalid}">
+                                                                <label for="adminCreateInstanceConnectionPort"
+                                                                       class="col-sm-2 control-label">Port</label>
+
+                                                                <div class="col-sm-6">
+                                                                    <input id="adminCreateInstanceConnectionPort"
+                                                                           name="adminCreateInstanceConnectionPort"
+                                                                           type="text" class="form-control"
+                                                                           ng-disabled="cInstance.connections[0].port == 21"
+                                                                           ng-model="cInstance.connections[0].port"
+                                                                           required ng-pattern="/^[0-9]{2,9}$/">
+                                                                    <span class="error"
+                                                                          style="color: #a94442; font-size: 12px"
+                                                                          ng-show="adminCreateInstance.adminCreateInstanceConnectionPort.$dirty && adminCreateInstance.adminCreateInstanceConnectionPort.$error.required">Port is required!</span>
+                                                                    <span class="error"
+                                                                          style="color: #a94442; font-size: 12px"
+                                                                          ng-show="adminCreateInstance.adminCreateInstanceConnectionPort.$dirty && adminCreateInstance.adminCreateInstanceConnectionPort.$error.pattern">Invalid Port</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group"
+                                                                 ng-class="{'has-error': adminCreateInstance.adminCreateInstanceConnectionUser.$dirty && adminCreateInstance.adminCreateInstanceConnectionUser.$invalid}">
+                                                                <label for="adminCreateInstanceConnectionUser"
+                                                                       class="col-sm-2 control-label">User</label>
+
+                                                                <div class="col-sm-6">
+                                                                    <input id="adminCreateInstanceConnectionUser"
+                                                                           name="adminCreateInstanceConnectionUser"
+                                                                           type="text" class="form-control"
+                                                                           ng-model="cInstance.connections[0].user"
+                                                                           required ng-maxlength="255">
+                                                                    <span class="error"
+                                                                          style="color: #a94442; font-size: 12px"
+                                                                          ng-show="adminCreateInstance.adminCreateInstanceConnectionUser.$dirty && adminCreateInstance.adminCreateInstanceConnectionUser.$error.required">User is required!</span>
+                                                                    <span class="error"
+                                                                          style="color: #a94442; font-size: 12px"
+                                                                          ng-show="adminCreateInstance.adminCreateInstanceConnectionUser.$dirty && adminCreateInstance.adminCreateInstanceConnectionUser.$error.maxlength">User cannot be greater than 255 characters!</span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="form-group"
+                                                                 ng-class="{'has-error': adminCreateInstance.adminCreateInstanceConnectionPassword1.$dirty && adminCreateInstance.adminCreateInstanceConnectionPassword1.$invalid}">
+                                                                <label for="adminCreateInstanceConnectionPassword1"
+                                                                       class="col-sm-2 control-label">Password</label>
+
+                                                                <div class="col-sm-6">
+                                                                    <input id="adminCreateInstanceConnectionPassword1"
+                                                                           name="adminCreateInstanceConnectionPassword1"
+                                                                           type="password" class="form-control"
+                                                                           ng-model="cInstance.connections[0].password"
+                                                                           required>
+                                                                    <span class="error"
+                                                                          style="color: #a94442; font-size: 12px"
+                                                                          ng-show="adminCreateInstance.adminCreateInstanceConnectionPassword1.$dirty && adminCreateInstance.adminCreateInstanceConnectionPassword1.$error.required">Password is required!</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group"
+                                                                 ng-class="{'has-error': adminCreateInstance.adminCreateInstanceConnectionPassword2.$dirty && adminCreateInstance.adminCreateInstanceConnectionPassword2.$invalid}">
+                                                                <label for="adminCreateInstanceConnectionPassword2"
+                                                                       class="col-sm-2 control-label">Re-Type Password
+                                                                </label>
+
+                                                                <div class="col-sm-6">
+                                                                    <input id="adminCreateInstanceConnectionPassword2"
+                                                                           name="adminCreateInstanceConnectionPassword2"
+                                                                           type="password" class="form-control"
+                                                                           ng-model="adminCreateInstanceConnectionPassword2"
+                                                                           required
+                                                                           pw-check="adminCreateInstanceConnectionPassword1">
+                                                                    <span class="error"
+                                                                          style="color: #a94442; font-size: 12px"
+                                                                          ng-show="adminCreateInstance.adminCreateInstanceConnectionPassword2.$dirty && adminCreateInstance.adminCreateInstanceConnectionPassword2.$error.pwmatch">Passwords do not match!</span>
+                                                                </div>
+                                                            </div>
+
+                                                            <h4 ng-show="cInstance.connections[0].attributes.length">
+                                                                Instance
+                                                                Connection Attributes</h4>
+
+                                                            <div ng-repeat="attribute in cInstance.connections[0].attributes">
+                                                                <ng-form name="attributeForm">
+                                                                    <div class="form-group"
+                                                                         ng-class="{'has-error': attributeForm.$dirty && attributeForm.$invalid}">
+                                                                        <label style="width:250px;"
+                                                                               class="col-sm-2 control-label">{{attribute.key}}</label>
+
+                                                                        <div class="col-sm-4">
+                                                                            <input id="attr1" name="attr1" type="text"
+                                                                                   class="form-control"
+                                                                                   ng-model="attribute.value" required>
+                                                                            <span class="error"
+                                                                                  style="color: #a94442; font-size: 12px"
+                                                                                  ng-show="attributeForm.attr.$dirty && attributeForm.attr.$error.required">Required!</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </ng-form>
+                                                            </div>
+                                                            <button type="button" class="btn pull-right btn-primary"
+                                                                    ng-click="addNewConnections()">Add +
+                                                            </button>
+                                                        </div>
+                                                        <div class="form-group"
+                                                             ng-repeat="connectionTypeResource in cInstance.connections | limitTo:5 track by $index">
+                                                            <div style="width:auto;" ng-if="!($index==0)">
+                                                                <ng-form name="connectionForm">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="alert alert-info" role="alert">
+                                                                            <a href="#" class="close"
+                                                                               data-dismiss="alert">&times;</a>Add New
+                                                                            Connection
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-horizontal">
+                                                                        <div class="form-group">
+                                                                            <label class="col-sm-2 control-label">Connection
+                                                                                Type
+                                                                            </label>
+
+                                                                            <div class="col-sm-6">
+                                                                                <select class="form-control"
+                                                                                        ng-model="connectionTypeResource.type"
+                                                                                        ng-options="connType.name as connType.name for connType in connectionTypes"
+                                                                                        ng-change="changedConnectionType(connectionTypeResource)">
+                                                                                    <option value="">Select a Connection
+                                                                                        Type
+                                                                                    </option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group"
+                                                                             ng-class="{'has-error': connectionForm.adminCreateInstanceConnectionNameOne.$dirty && connectionForm.adminCreateInstanceConnectionNameOne.$invalid}">
+                                                                            <label for="instanceName"
+                                                                                   class="col-sm-2 control-label">Name</label>
+
+                                                                            <div class="col-sm-6">
+                                                                                <input id="adminCreateInstanceConnectionNameOne"
+                                                                                       name="adminCreateInstanceConnectionNameOne"
+                                                                                       type="text" class="form-control"
+                                                                                       ng-model="connectionTypeResource.name"
+                                                                                       required ng-minlength="2"
+                                                                                       ng-maxlength="255">
+                                                                                <span class="error"
+                                                                                      style="color: #a94442; font-size: 12px"
+                                                                                      ng-show="connectionForm.adminCreateInstanceConnectionNameOne.$dirty && connectionForm.adminCreateInstanceConnectionNameOne.$error.required">Connection name is required!</span>
+                                                                                <span class="error"
+                                                                                      style="color: #a94442; font-size: 12px"
+                                                                                      ng-show="connectionForm.adminCreateInstanceConnectionNameOne.$dirty && connectionForm.adminCreateInstanceConnectionNameOne.$error.minlength">Connection name must be at least 2 characters!</span>
+                                                                                <span class="error"
+                                                                                      style="color: #a94442; font-size: 12px"
+                                                                                      ng-show="connectionForm.adminCreateInstanceConnectionNameOne.$dirty && connectionForm.adminCreateInstanceConnectionNameOne.$error.maxlength">Connection name cannot be greater than 255 characters!</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group"
+                                                                             ng-class="{'has-error': connectionForm.adminCreateInstanceConnectionDescriptionOne.$dirty && connectionForm.adminCreateInstanceConnectionDescriptionOne.$invalid}">
+                                                                            <label for="instanceName"
+                                                                                   class="col-sm-2 control-label">Description</label>
+
+                                                                            <div class="col-sm-6">
+                                                                                <input id="adminCreateInstanceConnectionDescriptionOne"
+                                                                                       name="adminCreateInstanceConnectionDescriptionOne"
+                                                                                       type="text" class="form-control"
+                                                                                       ng-model="connectionTypeResource.description"
+                                                                                       ng-maxlength="255">
+                                                                                <span class="error"
+                                                                                      style="color: #a94442; font-size: 12px"
+                                                                                      ng-show="connectionForm.adminCreateInstanceConnectionDescriptionOne.$dirty && connectionForm.adminCreateInstanceConnectionDescriptionOne.$error.maxlength">Connection description cannot be greater than 255 characters!</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group"
+                                                                             ng-class="{'has-error': connectionForm.adminCreateInstanceConnectionHostnameOne.$dirty && connectionForm.adminCreateInstanceConnectionHostnameOne.$invalid}">
+                                                                            <label for="adminCreateInstanceConnectionHostname"
+                                                                                   class="col-sm-2 control-label">Hostname</label>
+
+                                                                            <div class="col-sm-6">
+                                                                                <input id="adminCreateInstanceConnectionHostnameOne"
+                                                                                       name="adminCreateInstanceConnectionHostnameOne"
+                                                                                       type="text" class="form-control"
+                                                                                       ng-model="connectionTypeResource.hostname"
+                                                                                       required ng-maxlength="255">
+                                                                                <span class="error"
+                                                                                      style="color: #a94442; font-size: 12px"
+                                                                                      ng-show="connectionForm.adminCreateInstanceConnectionHostnameOne.$dirty && connectionForm.adminCreateInstanceConnectionHostnameOne.$error.required">Hostname is required!</span>
+                                                                                <span class="error"
+                                                                                      style="color: #a94442; font-size: 12px"
+                                                                                      ng-show="connectionForm.adminCreateInstanceConnectionHostnameOne.$dirty && connectionForm.adminCreateInstanceConnectionHostnameOne.$error.maxlength">Hostname cannot be greater than 255 characters!</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group"
+                                                                             ng-class="{'has-error': connectionForm.adminCreateInstanceConnectionPortOne.$dirty && connectionForm.adminCreateInstanceConnectionPortOne.$invalid}">
+                                                                            <label for="adminCreateInstanceConnectionPortOne"
+                                                                                   class="col-sm-2 control-label">Port</label>
+
+                                                                            <div class="col-sm-6">
+                                                                                <input id="adminCreateInstanceConnectionPortOne"
+                                                                                       name="adminCreateInstanceConnectionPortOne"
+                                                                                       type="text" class="form-control"
+                                                                                       ng-model="connectionTypeResource.port"
+                                                                                       ng-disabled="connectionTypeResource.port == 21"
+                                                                                       required
+                                                                                       ng-pattern="/^[0-9]{2,9}$/">
+                                                                                <span class="error"
+                                                                                      style="color: #a94442; font-size: 12px"
+                                                                                      ng-show="connectionForm.adminCreateInstanceConnectionPortOne.$dirty && connectionForm.adminCreateInstanceConnectionPortOne.$error.required">Port is required!</span>
+                                                                                <span class="error"
+                                                                                      style="color: #a94442; font-size: 12px"
+                                                                                      ng-show="connectionForm.adminCreateInstanceConnectionPortOne.$dirty && connectionForm.adminCreateInstanceConnectionPortOne.$error.pattern">Invalid Port</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group"
+                                                                             ng-class="{'has-error': connectionForm.adminCreateInstanceConnectionUserOne.$dirty && connectionForm.adminCreateInstanceConnectionUserOne.$invalid}">
+                                                                            <label for="adminCreateInstanceConnectionUser"
+                                                                                   class="col-sm-2 control-label">User</label>
+
+                                                                            <div class="col-sm-6">
+                                                                                <input id="adminCreateInstanceConnectionUserOne"
+                                                                                       name="adminCreateInstanceConnectionUserOne"
+                                                                                       type="text" class="form-control"
+                                                                                       ng-model="connectionTypeResource.user"
+                                                                                       required ng-maxlength="255">
+                                                                                <span class="error"
+                                                                                      style="color: #a94442; font-size: 12px"
+                                                                                      ng-show="connectionForm.adminCreateInstanceConnectionUserOne.$dirty && connectionForm.adminCreateInstanceConnectionUserOne.$error.required">User is required!</span>
+                                                                                <span class="error"
+                                                                                      style="color: #a94442; font-size: 12px"
+                                                                                      ng-show="connectionForm.adminCreateInstanceConnectionUserOne.$dirty && connectionForm.adminCreateInstanceConnectionUserOne.$error.maxlength">User cannot be greater than 255 characters!</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group"
+                                                                             ng-class="{'has-error': connectionForm.adminCreateInstanceConnectionPasswordOne.$dirty && connectionForm.adminCreateInstanceConnectionPasswordOne.$invalid}">
+                                                                            <label for="adminCreateInstanceConnectionPasswordOne"
+                                                                                   class="col-sm-2 control-label">Password</label>
+
+                                                                            <div class="col-sm-6">
+                                                                                <input ng-attr-id="{{ 'connectionpassword-' + $index }}"
+                                                                                       name="adminCreateInstanceConnectionPasswordOne"
+                                                                                       type="password"
+                                                                                       class="form-control"
+                                                                                       ng-model="connectionTypeResource.password"
+                                                                                       required>
+                                                                                <span class="error"
+                                                                                      style="color: #a94442; font-size: 12px"
+                                                                                      ng-show="connectionForm.adminCreateInstanceConnectionPasswordOne.$dirty && connectionForm.adminCreateInstanceConnectionPasswordOne.$error.required">Password is required!</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group"
+                                                                             ng-class="{'has-error': connectionForm.adminCreateInstanceConnectionPasswordTwo.$dirty && connectionForm.adminCreateInstanceConnectionPasswordTwo.$invalid}">
+                                                                            <label for="adminCreateInstanceConnectionPasswordTwo"
+                                                                                   class="col-sm-2 control-label">Re-Type
+                                                                                Password
+                                                                            </label>
+
+                                                                            <div class="col-sm-6">
+                                                                                <input id="adminCreateInstanceConnectionPasswordTwo"
+                                                                                       name="adminCreateInstanceConnectionPasswordTwo"
+                                                                                       type="password"
+                                                                                       class="form-control"
+                                                                                       ng-model="adminCreateInstanceConnectionPasswordTwo"
+                                                                                       required
+                                                                                       pw-check="{{ 'connectionpassword-' + $index }}">
+                                                                                <span class="error"
+                                                                                      style="color: #a94442; font-size: 12px"
+                                                                                      ng-show="connectionForm.adminCreateInstanceConnectionPasswordTwo.$dirty && connectionForm.adminCreateInstanceConnectionPasswordTwo.$error.pwmatch">Passwords do not match!</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <h4 ng-show="connectionTypeResource.attributes.length"
+                                                                            style="margin-left:15px;">Instance
+                                                                            Connection Attributes</h4>
+
+                                                                        <div ng-repeat="attribute in connectionTypeResource.attributes">
+                                                                            <ng-form name="attributeForm">
+                                                                                <div class="form-group"
+                                                                                     ng-class="{'has-error': attributeForm.$dirty && attributeForm.$invalid}">
+                                                                                    <label style="width:260px;"
+                                                                                           class="col-sm-2 control-label">{{attribute.key}}</label>
+
+                                                                                    <div class="col-sm-4">
+                                                                                        <input id="attr" name="attr"
+                                                                                               type="text"
+                                                                                               class="form-control"
+                                                                                               ng-model="attribute.value"
+                                                                                               required>
+                                                                                        <span class="error"
+                                                                                              style="color: #a94442; font-size: 12px"
+                                                                                              ng-show="attributeForm.attr.$dirty && attributeForm.attr.$error.required">Required!</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </ng-form>
+                                                                        </div>
+                                                                    </div>
+                                                                    <button type="button"
+                                                                            class="pull-right btn btn-danger"
+                                                                            style="margin-right:15px;"
+                                                                            ng-click="removeSubConnection($index)">
+                                                                        Remove
+                                                                    </button>
+                                                                </ng-form>
+                                                            </div>
+                                                        </div>
+                                                    </accordion-group>
+                                                </div>
+                                            </accordion-group>
+                                        </accordion>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <button style="margin-top: 10px" ng-disabled="!adminCreateInstance.$valid" type="submit"
+                                    class="pull-right btn btn-info" ng-click="createInstance(cInstance)">Create
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </accordion-group>
+            <accordion-group is-open="instanceAccordionModify.isOpen">
+                <accordion-heading>
+                    <i class="fa"
+                       ng-class="{'fa-angle-down': instanceAccordionModify.isOpen, 'fa-angle-right': !instanceAccordionModify.isOpen}"></i>
+                    Modify an Instance
+                </accordion-heading>
+                <form name="adminUpdateInstance" class="form-horizontal" role="form">
+                    <div class="col-lg-12">
+                        <h4>Instance</h4>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Instances</label>
+
+                            <div class="col-sm-6">
+                                <select class="form-control" ng-model="i" ng-options="i.name for i in instances"
+                                        ng-change="getInstance(i.id); getConnections(i.id)">
+                                    <option value="">Select an Instance</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-default" ng-click="refreshInstances()"><i
+                                        class="fa fa-refresh fa-fw"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">ID</label>
+
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="uInstance.id" required
+                                       ng-readonly="true">
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminUpdateInstance.instancUpdateName.$dirty && adminUpdateInstance.instancUpdateName.$invalid}">
+                            <label for="instancUpdateName" class="col-sm-2 control-label">Name</label>
+
+                            <div class="col-sm-6">
+                                <input id="instancUpdateName" name="instancUpdateName" type="text" class="form-control"
+                                       ng-model="uInstance.name" required ng-minlength="3" ng-maxlength="255">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstance.instancUpdateName.$dirty && adminUpdateInstance.instancUpdateName.$error.required">Instance name is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstance.instancUpdateName.$dirty && adminUpdateInstance.instancUpdateName.$error.minlength">Instance name must be at least 2 characters!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstance.instancUpdateName.$dirty && adminUpdateInstance.instancUpdateName.$error.maxlength">Instance name cannot be greater than 255 characters!</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminUpdateInstance.instanceUpdateDescription.$dirty && adminUpdateInstance.instanceUpdateDescription.$invalid}">
+                            <label for="instanceUpdateDescription" class="col-sm-2 control-label">Description</label>
+
+                            <div class="col-sm-6">
+                                <input id="instanceUpdateDescription" name="instanceUpdateDescription" type="text"
+                                       class="form-control" ng-model="uInstance.description" required
+                                       ng-maxlength="255">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstance.instanceUpdateDescription.$dirty && adminUpdateInstance.instanceUpdateDescription.$error.required">Instance description is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstance.instanceUpdateDescription.$dirty && adminUpdateInstance.instanceUpdateDescription.$error.maxlength">Instance description cannot be greater than 255 characters!</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">App Client Id</label>
+
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="uInstance.appClientId" required
+                                       ng-readonly="true">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Active</label>
+
+                            <div class="col-sm-6" style="margin-top: 7px">
+                                <input type="checkbox" ng-model="uInstance.active">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button style="margin-top: 10px" ng-disabled="!adminUpdateInstance.$valid" type="submit"
+                                    class="pull-right btn btn-info" ng-click="updateInstance(uInstance)">Update
+                            </button>
+                        </div>
+                        <h4 ng-show="uInstance.customerKeys.length">Customer Keys</h4>
+
+                        <div ng-repeat="attribute in uInstance.customerKeys">
+                            <accordion close-others="false">
+                                <accordion-group is-open="instanceCreateAccordionCustomerKey.isOpen">
+                                    <accordion-heading>
+                                        <i class="fa"
+                                           ng-class="{'fa-angle-down': instanceCreateAccordionCustomerKeyFIVE.isOpen, 'fa-angle-right': !instanceCreateAccordionCustomerKey.isOpen}"></i>
+                                        {{attribute.name}}
+                                    </accordion-heading>
+                                    <div>
+                                        <div class="form-group">
+                                            <label for="instanceCustomerKeyNameFIVE"
+                                                   class="col-sm-2 control-label">Name</label>
+
+                                            <div class="col-sm-8">
+                                                <input id="{{attribute.name}}" name="{{attribute.name}}"
+                                                       ng-readonly=true type="text" class="form-control"
+                                                       ng-model="uInstance.customerKeys[$index].name">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="instanceCustomerKeyDataTypeFIVE" class="col-sm-2 control-label">Data
+                                                Type
+                                            </label>
+
+                                            <div class="col-sm-8">
+                                                <input id="{{attribute.dataType}}" name="{{attribute.dataType}}"
+                                                       ng-readonly=true type="text" class="form-control"
+                                                       ng-model="uInstance.customerKeys[$index].dataType">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="instanceCustomerKeySizeFIVE"
+                                                   class="col-sm-2 control-label">Size</label>
+
+                                            <div class="col-sm-8">
+                                                <input id="{{attribute.size}}" name="{{attribute.size}}" type="text"
+                                                       ng-readonly=true class="form-control"
+                                                       ng-model="uInstance.customerKeys[$index].size">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="instanceCustomerKeyOP" class="col-sm-2 control-label">Ordinal
+                                                Position
+                                            </label>
+
+                                            <div class="col-sm-8">
+                                                <input id="{{attribute.ordinalPos}}" name="{{attribute.ordinalPos}}"
+                                                       type="text" ng-readonly=true class="form-control"
+                                                       ng-model="uInstance.customerKeys[$index].ordinalPos">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="instanceCustomerKeyOP" class="col-sm-2 control-label">sdm Column
+                                            </label>
+
+                                            <div class="col-sm-8">
+                                                <input id="{{attribute.sdmColumn}}" name="{{attribute.sdmColumn}}"
+                                                       type="text" ng-readonly=true class="form-control"
+                                                       ng-model="uInstance.customerKeys[$index].sdmColumn">
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </accordion-group>
+                            </accordion>
+                        </div>
+                    </div>
+                </form>
+            </accordion-group>
+            <accordion-group is-open="instanceAccordionAddConnection1.isOpen">
+                <accordion-heading>
+                    <i class="fa"
+                       ng-class="{'fa-angle-down': instanceAccordionAddConnection1.isOpen, 'fa-angle-right': !instanceAccordionAddConnection1.isOpen}"></i>
+                    Add Instance Connection
+                </accordion-heading>
+                <form name="adminCreateInstanceConnection" class="form-horizontal" role="form">
+                    <div class="col-lg-12">
+                        <h4>Instance Connections</h4>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Instances</label>
+
+                            <div class="col-sm-6">
+                                <select class="form-control" ng-model="i" ng-options="i.name for i in instances"
+                                        ng-change="connType='0'; getInstance(i.id); getConnections(i.id); resetConnectionTypeResource(); ">
+                                    <option value="">Select an Instance</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">ID</label>
+
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="uInstance.id" required
+                                       ng-readonly="true">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Connection Type</label>
+
+                            <div class="col-sm-6">
+                                <select class="form-control" ng-model="connType"
+                                        ng-options="connType.name for connType in connectionTypesOne"
+                                        ng-change="getConnectionTypeResource(connType.name)">
+                                    <option value="">Select a Connection Type</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Name of the connection -->
+                        <div class="form-group"
+                             ng-class="{'has-error': adminCreateInstanceConnection.adminCreateInstanceConnectionName2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionName2.$invalid}">
+                            <label for="adminCreateInstanceConnectionName2" class="col-sm-2 control-label">Name</label>
+
+                            <div class="col-sm-6">
+                                <input id="adminCreateInstanceConnectionName2" name="adminCreateInstanceConnectionName2"
+                                       type="text" class="form-control" ng-model="connectionTypeResource.name" required
+                                       ng-minlength="2" ng-maxlength="255">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstanceConnection.adminCreateInstanceConnectionName2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionName2.$error.required">Connection name is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstanceConnection.adminCreateInstanceConnectionName2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionName2.$error.minlength">Connection name must be at least 2 characters!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstanceConnection.adminCreateInstanceConnectionName2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionName2.$error.maxlength">Connection name cannot be greater than 255 characters!</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminCreateInstanceConnection.adminCreateInstanceConnectionDescription2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionDescription2.$invalid}">
+                            <label for="adminCreateInstanceConnectionDescription2" class="col-sm-2 control-label">Description</label>
+
+                            <div class="col-sm-6">
+                                <input id="adminCreateInstanceConnectionDescription2"
+                                       name="adminCreateInstanceConnectionDescription2" type="text" class="form-control"
+                                       ng-model="connectionTypeResource.description" ng-maxlength="255">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstanceConnection.adminCreateInstanceConnectionDescription2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionDescription2.$error.maxlength">Connection description cannot be greater than 255 characters!</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminCreateInstanceConnection.adminCreateInstanceConnectionHostname2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionHostname2.$invalid}">
+                            <label for="adminCreateInstanceConnectionHostname2"
+                                   class="col-sm-2 control-label">Hostname</label>
+
+                            <div class="col-sm-6">
+                                <input id="adminCreateInstanceConnectionHostname2"
+                                       name="adminCreateInstanceConnectionHostname2" type="text" class="form-control"
+                                       ng-model="connectionTypeResource.hostname" required ng-maxlength="255">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstanceConnection.adminCreateInstanceConnectionHostname2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionHostname2.$error.required">Hostname is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstanceConnection.adminCreateInstanceConnectionHostname2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionHostname2.$error.maxlength">Hostname cannot be greater than 255 characters!</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminCreateInstanceConnection.adminCreateInstanceConnectionPort2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionPort2.$invalid}">
+                            <label for="adminCreateInstanceConnectionPort2" class="col-sm-2 control-label">Port</label>
+
+                            <div class="col-sm-6">
+                                <input id="adminCreateInstanceConnectionPort2" name="adminCreateInstanceConnectionPort2"
+                                       type="text" class="form-control" ng-model="connectionTypeResource.port"
+                                       ng-disabled="connectionTypeResource.port == 21" required
+                                       ng-pattern="/^[0-9]{2,9}$/">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstanceConnection.adminCreateInstanceConnectionPort2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionPort2.$error.required">Port is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstanceConnection.adminCreateInstanceConnectionPort2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionPort2.$error.pattern">Invalid Port</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminCreateInstanceConnection.adminCreateInstanceConnectionUser2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionUser2.$invalid}">
+                            <label for="adminCreateInstanceConnectionUser2" class="col-sm-2 control-label">User</label>
+
+                            <div class="col-sm-6">
+                                <input id="adminCreateInstanceConnectionUser2" name="adminCreateInstanceConnectionUser2"
+                                       type="text" class="form-control" ng-model="connectionTypeResource.user" required
+                                       ng-maxlength="255">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstanceConnection.adminCreateInstanceConnectionUser2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionUser2.$error.required">User is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstanceConnection.adminCreateInstanceConnectionUser2.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionUser2.$error.maxlength">User cannot be greater than 255 characters!</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminCreateInstanceConnection.adminCreateInstanceConnectionPassword12.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionPassword12.$invalid}">
+                            <label for="adminCreateInstanceConnectionPassword12"
+                                   class="col-sm-2 control-label">Password</label>
+
+                            <div class="col-sm-6">
+                                <input id="adminCreateInstanceConnectionPassword12"
+                                       name="adminCreateInstanceConnectionPassword12" type="password"
+                                       class="form-control" ng-model="connectionTypeResource.password" required>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstanceConnection.adminCreateInstanceConnectionPassword12.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionPassword12.$error.required">Password is required!</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminCreateInstanceConnection.adminCreateInstanceConnectionPassword21.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionPassword21.$invalid}">
+                            <label for="adminCreateInstanceConnectionPassword21" class="col-sm-2 control-label">Re-Type
+                                Password
+                            </label>
+
+                            <div class="col-sm-6">
+                                <input id="adminCreateInstanceConnectionPassword21"
+                                       name="adminCreateInstanceConnectionPassword21" type="password"
+                                       class="form-control" ng-model="adminCreateInstanceConnectionPassword21" required
+                                       pw-check="adminCreateInstanceConnectionPassword12">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminCreateInstanceConnection.adminCreateInstanceConnectionPassword21.$dirty && adminCreateInstanceConnection.adminCreateInstanceConnectionPassword21.$error.pwmatch">Passwords do not match!</span>
+                            </div>
+                        </div>
+                        <h4 ng-show="connectionTypeResource.attributes.length">Instance Connection Attributes</h4>
+
+                        <div ng-repeat="attribute in connectionTypeResource.attributes">
+                            <div class="form-group"
+                                 ng-class="{'has-error': adminCreateInstanceConnection.{{attribute.key2}}.$dirty && adminCreateInstanceConnection.{{attribute.key2}}.$invalid}">
+                                <label class="col-sm-2 control-label" style="width:250px;">{{attribute.key}}</label>
+
+                                <div class="col-sm-4">
+                                    <input id="{{attribute.key2}}" name="{{attribute.key2}}" type="text"
+                                           class="form-control"
+                                           ng-model="connectionTypeResource.attributes[$index].value" required>
+                                    <span class="error" style="color: #a94442; font-size: 12px"
+                                          ng-show="adminCreateInstanceConnection.{{attribute.key2}}.$dirty && adminCreateInstanceConnection.{{attribute.key2}}.$error.required">Required!</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button style="margin-top: 10px" class="btn btn-warning pull-right" type="reset"
+                                    ng-click="resetUpdateConnection(adminCreateInstanceConnection)">Clear
+                            </button>
+                            <button style="margin-top: 10px; margin-right: 10px"
+                                    ng-disabled="!adminCreateInstanceConnection.$valid"
+                                    type="submit" class="pull-right btn btn-info"
+                                    ng-click="addConnection(connectionTypeResource)"
+                                    ng-disabled="!adminCreateInstanceConnection.$valid">Create Connection
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </accordion-group>
+            <accordion-group is-open="instanceAccordionManageConnection.isOpen">
+                <accordion-heading>
+                    <i class="fa"
+                       ng-class="{'fa-angle-down': instanceAccordionManageConnection.isOpen, 'fa-angle-right': !instanceAccordionManageConnection.isOpen}"></i>
+                    Manage Instance Connections
+                </accordion-heading>
+                <form name="adminUpdateInstanceConnection" class="form-horizontal" role="form">
+                    <div class="col-lg-12">
+                        <h4>Instance Connections</h4>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Instances</label>
+
+                            <div class="col-sm-6">
+                                <select class="form-control" ng-model="i" ng-options="i.name for i in instances"
+                                        ng-change="getInstance(i.id); getConnections(i.id)">
+                                    <option value="">Select an Instance</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">ID</label>
+
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="uInstance.id" required
+                                       ng-readonly="true">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Connections</label>
+
+                            <div class="col-sm-6">
+                                <select class="form-control" ng-model="c" ng-options="c.name for c in connections "
+                                        ng-change="getConnection(c.id)">
+                                    <option value="">Select a Connection</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-default" ng-click="refreshConnections(i.id)"><i
+                                        class="fa fa-refresh fa-fw"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"> Connection ID</label>
+
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="uConnection.id" required
+                                       ng-readonly="true">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Type</label>
+
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="uConnection.type" required
+                                       ng-readonly="true">
+
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminUpdateInstanceConnection.adminUpdateInstanceConnectionName.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionName.$invalid}">
+                            <label for="instanceName" class="col-sm-2 control-label">Name</label>
+
+                            <div class="col-sm-6">
+                                <input id="adminUpdateInstanceConnectionName" name="adminUpdateInstanceConnectionName"
+                                       type="text" class="form-control" ng-model="uConnection.name" required
+                                       ng-minlength="2" ng-maxlength="255">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstanceConnection.adminUpdateInstanceConnectionName.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionName.$error.required">Connection name is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstanceConnection.adminUpdateInstanceConnectionName.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionName.$error.minlength">Connection name must be at least 2 characters!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstanceConnection.adminUpdateInstanceConnectionName.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionName.$error.maxlength">Connection name cannot be greater than 255 characters!</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminUpdateInstanceConnection.adminUpdateInstanceConnectionDescription.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionDescription.$invalid}">
+                            <label for="instanceName" class="col-sm-2 control-label">Description</label>
+
+                            <div class="col-sm-6">
+                                <input id="adminUpdateInstanceConnectionDescription"
+                                       name="adminUpdateInstanceConnectionDescription" type="text" class="form-control"
+                                       ng-model="uConnection.description" ng-maxlength="255">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstanceConnection.adminUpdateInstanceConnectionDescription.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionDescription.$error.maxlength">Connection description cannot be greater than 255 characters!</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminUpdateInstanceConnection.adminUpdateInstanceConnectionHostname.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionHostname.$invalid}">
+                            <label for="adminUpdateInstanceConnectionHostname"
+                                   class="col-sm-2 control-label">Hostname</label>
+
+                            <div class="col-sm-6">
+                                <input id="adminUpdateInstanceConnectionHostname"
+                                       name="adminUpdateInstanceConnectionHostname" type="text" class="form-control"
+                                       ng-model="uConnection.hostname" required ng-maxlength="255">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstanceConnection.adminUpdateInstanceConnectionHostname.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionHostname.$error.required">Hostname is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstanceConnection.adminUpdateInstanceConnectionHostname.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionHostname.$error.maxlength">Hostname cannot be greater than 255 characters!</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminUpdateInstanceConnection.adminUpdateInstanceConnectionPort.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionPort.$invalid}">
+                            <label for="adminUpdateInstanceConnectionHostname"
+                                   class="col-sm-2 control-label">Port</label>
+
+                            <div class="col-sm-6">
+                                <input id="adminUpdateInstanceConnectionPort" name="adminUpdateInstanceConnectionPort"
+                                       type="text" class="form-control" ng-model="uConnection.port" required
+                                       ng-pattern="/^[0-9]{1,9}$/">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstanceConnection.adminUpdateInstanceConnectionPort.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionPort.$error.required">Port is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstanceConnection.adminUpdateInstanceConnectionPort.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionPort.$error.pattern">Port is an integer</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminUpdateInstanceConnection.adminUpdateInstanceConnectionUser.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionUser.$invalid}">
+                            <label for="adminUpdateInstanceConnectionUser" class="col-sm-2 control-label">User</label>
+
+                            <div class="col-sm-6">
+                                <input id="adminUpdateInstanceConnectionUser" name="adminUpdateInstanceConnectionUser"
+                                       type="text" class="form-control" ng-model="uConnection.user" required
+                                       ng-maxlength="255">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstanceConnection.adminUpdateInstanceConnectionUser.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionUser.$error.required">User is required!</span>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstanceConnection.adminUpdateInstanceConnectionUser.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionUser.$error.maxlength">User cannot be greater than 255 characters!</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminUpdateInstanceConnection.adminUpdateInstanceConnectionPassword1.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionPassword1.$invalid}">
+                            <label for="adminUpdateInstanceConnectionPassword1"
+                                   class="col-sm-2 control-label">Password</label>
+
+                            <div class="col-sm-6">
+                                <input id="adminUpdateInstanceConnectionPassword1"
+                                       name="adminUpdateInstanceConnectionPassword1" type="password"
+                                       class="form-control" ng-model="uConnection.password" required>
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstanceConnection.adminUpdateInstanceConnectionPassword1.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionPassword1.$error.required">Password is required!</span>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                             ng-class="{'has-error': adminUpdateInstanceConnection.adminUpdateInstanceConnectionPassword2.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionPassword2.$invalid}">
+                            <label for="adminUpdateInstanceConnectionPassword2" class="col-sm-2 control-label">Re-Type
+                                Password
+                            </label>
+
+                            <div class="col-sm-6">
+                                <input id="adminUpdateInstanceConnectionPassword2"
+                                       name="adminUpdateInstanceConnectionPassword2" type="password"
+                                       class="form-control" ng-model="adminUpdateInstanceConnectionPassword2" required
+                                       pw-check="adminUpdateInstanceConnectionPassword1">
+                                <span class="error" style="color: #a94442; font-size: 12px"
+                                      ng-show="adminUpdateInstanceConnection.adminUpdateInstanceConnectionPassword2.$dirty && adminUpdateInstanceConnection.adminUpdateInstanceConnectionPassword2.$error.pwmatch">Passwords do not match!</span>
+                            </div>
+                        </div>
+                        <h4 ng-show="uConnection.attributes.length">Instance Connection Attributes</h4>
+
+                        <div ng-repeat="attribute in uConnection.attributes">
+                            <div class="form-group"
+                                 ng-class="{'has-error': adminUpdateInstanceConnection.{{attribute.key}}.$dirty && adminUpdateInstanceConnection.{{attribute.key}}.$invalid}">
+                                <label style="width:250px;" class="col-sm-2 control-label">{{attribute.key}}</label>
+
+                                <div class="col-sm-4">
+                                    <input id="{{attribute.key}}" name="{{attribute.key}}" type="text"
+                                           class="form-control" ng-model="uConnection.attributes[$index].value"
+                                           required>
+                                    <span class="error" style="color: #a94442; font-size: 12px"
+                                          ng-show="adminUpdateInstanceConnection.{{attribute.key}}.$dirty && adminUpdateInstanceConnection.{{attribute.key}}.$error.required">Required!</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button style="margin-top: 10px" class="pull-right btn btn-warning"
+                                    type="reset" ng-click="resetUpdateConnection(adminUpdateInstanceConnection)">Clear
+                            </button>
+                            <button style="margin-top: 10px; margin-right: 10px"
+                                    ng-disabled="!adminUpdateInstanceConnection.$valid"
+                                    type="submit" class="pull-right btn btn-info"
+                                    ng-click="updateConnection(uConnection)"
+                                    ng-disabled="!adminUpdateInstanceConnection.$valid">Update
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </accordion-group>
+        </accordion>
+    </div>
+</div>

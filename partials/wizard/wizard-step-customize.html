@@ -1,0 +1,126 @@
+<div data-ng-controller="wizardCustomizeController">
+    <form name="wizardJobFormCustomize" class="form-horizontal" role="form">
+        <div class="row" style="margin-top: 15px;">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-wrench fa-fw"></i>
+                        {{L.customizeSectionHeader}}
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <h4>{{L.campaignOnCompletion}}</h4>
+                                <div class="form-group">
+                                    <label for="cdmCampaigns"
+                                        class="col-sm-2 control-label"
+                                    >{{L.campaignsLabel}}:</label>
+                                    <div class="col-sm-10">
+                                        <select id="cdmCampaigns"
+                                            name="cdmCampaigns"
+                                            class="form-control"
+                                            data-ng-model="jobConfigTemplate.campaignId"
+                                            data-ng-options="cdmCamp.id as cdmCamp.name for cdmCamp in savedState.cdmCampaigns | orderBy: 'name'"
+                                            data-ng-disabled="isBlocking() || disableCampaignList"
+                                        >
+                                            <option selected value="">
+                                                {{L.campaignsPlaceholder}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <h4>{{L.notificationsHeader}}</h4>
+                                <div class="form-group"
+                                    data-ng-class="{'has-error': wizardJobFormCustomize.successEmail.$error.dirEmailListCheck && successNotifications}"
+                                >
+
+                                    <label class="col-sm-2 control-label">
+                                        <span data-ng-show="notficationsRequired">*</span> {{L.notifyOnSuccessLabel}}:
+                                    </label>
+                                    <div class="col-sm-10">
+                                        <div class="input-group">
+                                            <span class="input-group-addon">
+                                                <input type="checkbox"
+                                                    data-ng-model="savedState.successNotifications"
+                                                    data-ng-change="confirmValidation(savedState.successNotifications, jobConfigTemplate.successEmail)"
+                                                    data-ng-disabled="isBlocking()"
+                                                >
+                                            </span>
+                                            <input id="successEmail"
+                                                name="successEmail"
+                                                type="text"
+                                                data-ng-model="jobConfigTemplate.successEmail"
+                                                dir-email-list-check
+                                                popover-placement="top"
+                                                popover="{{L.separateEmailsWithSemicolon}}"
+                                                popover-trigger="focus"
+                                                data-ng-readonly="!savedState.successNotifications"
+                                                data-ng-disabled="isBlocking()"
+                                                class="form-control"
+                                                placeholder="{{L.emailAddressPlaceholder}}"
+                                                data-ng-required="notficationsRequired"
+                                            >
+                                        </div>
+                                        <span class="error"
+                                            style="color: #a94442; font-size: 12px;"
+                                            data-ng-show="wizardJobFormCustomize.successEmail.$error.dirEmailListCheck && savedState.successNotifications"
+                                        >
+                                            <br>
+                                            {{L.errorNotifyOnSuccessValue}}
+                                            <br><br>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group"
+                                    data-ng-class="{'has-error': wizardJobFormCustomize.failureEmail.$error.dirEmailListCheck && failureNotifications}"
+                                >
+                                    <label class="col-sm-2 control-label">
+                                        <span data-ng-show="notficationsRequired">*</span> {{L.notifyOnFailLabel}}:
+                                    </label>
+                                    <div class="col-sm-10">
+                                        <div class="input-group">
+                                            <span class="input-group-addon">
+                                                <input type="checkbox"
+                                                    data-ng-model="savedState.failureNotifications"
+                                                    data-ng-change="confirmValidationFail(savedState.failureNotifications, jobConfigTemplate.failureEmail)"
+                                                    data-ng-disabled="isBlocking()"
+                                                >
+                                            </span>
+                                            <input id="failureEmail"
+                                                name="failureEmail"
+                                                type="text"
+                                                class="form-control"
+                                                popover-placement="top"
+                                                popover="{{L.separateEmailsWithSemicolon}}"
+                                                dir-email-list-check
+                                                popover-trigger="focus"
+                                                data-ng-model="jobConfigTemplate.failureEmail"
+                                                data-ng-readonly="!savedState.failureNotifications"
+                                                data-ng-disabled="isBlocking()"
+                                                placeholder="{{L.emailAddressPlaceholder}}"
+                                                data-ng-required="notficationsRequired"
+                                            >
+                                        </div>
+                                        <span class="error"
+                                            style="color: #a94442; font-size: 12px;"
+                                            data-ng-show="wizardJobFormCustomize.failureEmail.$error.dirEmailListCheck && savedState.failureNotifications"
+                                        >
+                                            <br>
+                                            {{L.errorNotifyOnFailValue}}
+                                            <br >
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="error" style="color: #a94442; font-size: 12px;" data-ng-show="notficationsRequired">
+                                    * Notification emails are required with Step 3 validation selections
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

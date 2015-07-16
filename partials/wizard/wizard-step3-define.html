@@ -1,0 +1,318 @@
+<div data-ng-controller="wizardStep3DefineController">
+    <div class="row" style="margin-top: 15px;">
+        <form name="wizardJobFormStep3Options"
+            class="form-horizontal"
+            role="form"
+        >
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-list fa-fw"></i>
+                        {{L.optionsSectionHeader}}
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <p><strong>{{L.feedIDLabel}}:</strong>
+                                    {{jobConfigTemplate.dlModule.feed.id}}
+                                </p>
+                                <p><strong>{{L.feedFileNameLabel}}:</strong>
+                                    {{jobConfigTemplate.dlModule.feed.name | limitTo: 33}}
+                                </p>
+                                <p><strong>{{L.feedFileSizeLabel}}:</strong>
+                                    {{interpolate(L.feedFileSize, jobConfigTemplate.dlModule.feed.fileSizeBytes)}}
+                                </p>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="hasHeaders"
+                                        class="col-sm-4 control-label"
+                                    >{{L.hasHeaderLabel}}:</label>
+                                    <div class="col-sm-6">
+                                        <div class="checkbox" id="hasHeaders">
+                                            <input type="checkbox"
+                                                data-ng-model="hasHeader"
+                                                data-ng-change="setHeader()"
+                                                data-ng-disabled="isBlocking()"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="delimiter"
+                                        class="col-sm-4 control-label"
+                                    >
+                                        {{L.selectDelimiterLabel}}:
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select id="delimiter"
+                                            class="form-control"
+                                            data-ng-model="savedState.delimiter"
+                                            data-ng-options="delimiter.label for delimiter in savedState.delimiters"
+                                            data-ng-disabled="isBlocking() || manualDelimiterCheckbox"
+                                            data-ng-change="setDelimiter(savedState.delimiter)"
+                                        >
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"
+                                    data-ng-class="{'has-error': wizardJobFormStep3Options.manualDelimiterInput.$dirty && wizardJobFormStep3Options.manualDelimiterInput.$invalid}"
+                                >
+                                    <label for="manualDelimiterInput"
+                                        class="col-sm-4 control-label"
+                                    ></label>
+                                    <div class="col-sm-6">
+                                        <div class="input-group">
+                                            <span class="input-group-addon">
+                                                <input type="checkbox"
+                                                    data-ng-model="manualDelimiterCheckbox"
+                                                    data-ng-change="resetDelimiter(manualDelimiterCheckbox)"
+                                                    data-ng-disabled="isBlocking()"
+                                                >
+                                            </span>
+                                                <input id="manualDelimiterInput"
+                                                    name="manualDelimiterInput"
+                                                    type="text"
+                                                    class="form-control"
+                                                    placeholder="{{L.manualDelimiterPlaceholder}}"
+                                                    data-ng-model="delimiterFreeForm.value"
+                                                    data-ng-readonly="!manualDelimiterCheckbox"
+                                                    data-ng-disabled="isBlocking()"
+                                                    data-ng-required="manualDelimiterCheckbox"
+                                                    data-ng-pattern="/^[\w`~!@#\$%\^\&\*\(\)-=<>'\.\?]$/"
+                                                >
+                                        </div>
+                                        <span class="error"
+                                            style="color: #a94442; font-size: 12px;"
+                                            data-ng-show="wizardJobFormStep3Options.manualDelimiterInput.$dirty && wizardJobFormStep3Options.manualDelimiterInput.$error.required"
+                                        >{{L.errorManualDelimiterRequired}}</span>
+                                        <span class="error"
+                                            style="color: #a94442; font-size: 12px;"
+                                            data-ng-show="wizardJobFormStep3Options.manualDelimiterInput.$dirty && wizardJobFormStep3Options.manualDelimiterInput.$error.pattern"
+                                        >{{L.errorManualDelimiterPattern}}</span>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <button type="button"
+                                            class="btn btn-default"
+                                            data-ng-disabled="!manualDelimiterCheckbox"
+                                            data-ng-click="setFreeFormDelimiter(delimiterFreeForm)"
+                                        >
+                                            <i class="fa fa-refresh fa-fw"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="textQualifier"
+                                        class="col-sm-4 control-label"
+                                    >{{L.textQualifierLabel}}:</label>
+                                    <div class="col-sm-8">
+                                        <select id="textQualifier"
+                                            class="form-control"
+                                            data-ng-model="savedState.textQualifier"
+                                            data-ng-options="textQualifier.label for textQualifier in savedState.textQualifiers"
+                                            data-ng-change="setTextQualifier(savedState.textQualifier)"
+                                            data-ng-disabled="isBlocking()"
+                                        >
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="rowTerminator"
+                                        class="col-sm-4 control-label"
+                                    >{{L.lineTerminatorLabel}}:</label>
+                                    <div class="col-sm-8">
+                                        <select id="rowTerminator"
+                                            class="form-control"
+                                            data-ng-model="savedState.rowTerminator"
+                                            data-ng-options="rowTerminator.label for rowTerminator in savedState.rowTerminators"
+                                            data-ng-change="setRowTerminator(savedState.rowTerminator)"
+                                            data-ng-disabled="isBlocking()"
+                                        >
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <accordion close-others="false">
+                    <accordion-group is-open="reviewMappingAccordion.isOpen">
+                        <accordion-heading>
+                            <i class="fa fa-gears fa-fw"></i> {{L.advancedSectionHeader}}
+                            <div style="float: right"><i class="fa" data-ng-class="{'fa-minus': reviewMappingAccordion.isOpen, 'fa-plus': !reviewMappingAccordion.isOpen}"></i></div>
+                        </accordion-heading>
+
+                        <div class="row">
+                            <div class="col-lg-2"><strong>{{L.validationTypeLabel}}</strong></div>
+                            <div class="col-lg-1">
+                                <div class="form-group">
+                                    <div data-ng-repeat="jobValidationType in savedState.validationTypes" data-ng-init="jobConfigTemplate.validationModule.validationType = defaultValidType">
+                                        <input id="{{jobValidationType.id}}"
+                                               name="validType"
+                                               type="radio"
+                                               data-ng-model="jobConfigTemplate.validationModule.validationType"
+                                               data-ng-change="resetValidationType()"
+                                               data-ng-value="jobValidationType"
+                                               data-ng-disabled="isBlocking()"
+                                            ><label for="{{jobValidationType.id}}">{{jobValidationType.value}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-9">
+                                <div class="form-group" data-ng-show="jobConfigTemplate.validationModule.validationType.id == 1">
+                                    <br />
+                                    <div class="col-sm-6">
+                                        *&nbsp;&nbsp;<input id="validationAmount"
+                                               name="validationAmount"
+                                               type="input"
+                                               size="20"
+                                               data-ng-model="jobConfigTemplate.validationModule.validationAmount"
+                                               data-ng-disabled="isBlocking()"
+                                               data-ng-pattern="/^[0-9+]*$/"
+                                               placeholder="Exact Value"
+                                               data-ng-required="jobConfigTemplate.validationModule.validationType.id == 1"
+                                                >
+                                        <span class="error" style="color: #a94442; font-size: 12px"
+                                              data-ng-show="wizardJobFormStep3Options.validationAmount.$error.pattern">Exact value must be a number</span>
+                                    </div>
+                                </div>
+                                <div data-ng-show="jobConfigTemplate.validationModule.validationType.id == 2">
+                                    <br /><br /><br />
+                                    From&nbsp;&nbsp;
+                                    *&nbsp;&nbsp;<input id="validationRangeLower"
+                                           name="validationRangeLower"
+                                           type="input"
+                                           size="20"
+                                           placeholder="from value"
+                                           data-ng-model="jobConfigTemplate.validationModule.validationRangeLower"
+                                           data-ng-pattern="/^[0-9+]*$/"
+                                           data-ng-disabled="isBlocking()"
+                                           data-ng-required="jobConfigTemplate.validationModule.validationType.id == 2"
+                                            >
+                                    &nbsp;&nbsp;To&nbsp;&nbsp;
+                                    *&nbsp;&nbsp;<input id="validationRangeUpper"
+                                           name="validationRangeUpper"
+                                           type="input"
+                                           size="20"
+                                           placeholder="to value"
+                                           data-ng-model="jobConfigTemplate.validationModule.validationRangeUpper"
+                                           data-ng-pattern="/^[0-9+]*$/"
+                                           data-ng-disabled="isBlocking()"
+                                           data-ng-required="jobConfigTemplate.validationModule.validationType.id == 2"
+                                            >
+                                        <span class="error" style="color: #a94442; font-size: 12px"
+                                          data-ng-show="wizardJobFormStep3Options.validationRangeLower.$error.pattern">From value must be a number<br /></span>
+                                        <span class="error" style="color: #a94442; font-size: 12px"
+                                              data-ng-show="wizardJobFormStep3Options.validationRangeUpper.$error.pattern">To value must be a number</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-2"><strong>Rejected Record %</strong></div>
+                            <div class="col-lg-1">
+                            <div class="form-group">
+                                    <input id="rejectThreshold"
+                                        name="rejectThreshold"
+                                        type="input"
+                                        size="20"
+                                        placeholder="% Reject Records"
+                                        data-ng-model="jobConfigTemplate.rejectThreshold"
+                                        data-ng-pattern="/^(0?[1-9]|[1-9][0-9]|99)$/"
+                                        data-ng-disabled="isBlocking()">
+                                        <span class="error" style="color: #a94442; font-size: 12px"
+                                              data-ng-show="wizardJobFormStep3Options.rejectThreshold.$error.pattern">Reject Threshold must be a number between 1-99</span>
+                                    </div>
+                                </div>
+                        </div>
+
+                        <!-- #{{jobConfigTemplate.validationModule.validationType}}# -->
+                        <div class="row" data-ng-show="jobConfigTemplate.validationModule.validationType.id != 0">
+                            <div class="col-lg-12"><strong>Notifications- Please check all that apply</strong><br /><br />
+                            </div>
+                        </div>
+
+                        <div class="row" data-ng-show="jobConfigTemplate.validationModule.validationType.id != 0">
+                            <div class="col-lg-12">
+                                <div class="row">
+                                    <div class="col-lg-2">Abort if not met</div>
+                                        <div class="col-lg-2">
+                                            <input type="checkbox" data-ng-model="jobConfigTemplate.validationModule.abort" data-ng-disabled="isBlocking()">
+                                        </div>
+                                </div>
+                                <div class="row"><br />
+                                    <div class="col-lg-2">Notify if</div>
+                                    <div class="col-lg-2">
+                                        <input type="checkbox"
+                                               name="notify"
+                                               id="above"
+                                               data-ng-model="jobConfigTemplate.validationModule.notifyLevelAbove"
+                                               data-ng-disabled="isBlocking()"
+                                                >&nbsp;<label for="above">Above</label><br />
+                                        <input type="checkbox"
+                                               id="below"
+                                               name="notify"
+                                               data-ng-model="jobConfigTemplate.validationModule.notifyLevelBelow"
+                                               data-ng-disabled="isBlocking()"
+                                                >&nbsp;<label for="below">Below</label>
+                                    </div>
+                                </div>
+                                <div class="row"><br />
+                                    <div class="col-lg-2">Notify on abort</div>
+                                    <div class="col-lg-2">
+                                        <input type="checkbox"
+                                               data-ng-model="jobConfigTemplate.validationModule.notifyOnAbort"
+                                               data-ng-disabled="isBlocking()"
+                                                >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </accordion-group>
+                </accordion>
+            </div>
+        </form>
+
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-search fa-fw"></i> {{L.previewSectionHeader}}
+                </div>
+                <div class="panel-body">
+                    <div style="max-height: 300px; overflow: auto;">
+                        <table id="tablePreview"
+                            class="table table-striped table-bordered table-hover"
+                            style="overflow: auto"
+                        >
+                            <thead>
+                                <tr>
+                                    <th nowrap
+                                        data-ng-repeat="headerRec in headerRecord"
+                                    >
+                                        <a href=""
+                                            editable-text="headerRec.name"
+                                            onbeforesave="validateHeaderNameBeforeSave($data)"
+                                            onaftersave="setHeaderRecordAfterSave()"
+                                        >
+                                            {{headerRec.name || L.errorEmptyPreviewData}}
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-ng-repeat="record in records">
+                                    <td nowrap
+                                        data-ng-repeat="headerRec in headerRecord"
+                                    >{{record[headerRec.ordinalPos]}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

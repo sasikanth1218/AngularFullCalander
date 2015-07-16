@@ -1,0 +1,154 @@
+<div class="row" style="margin-top: 10px">
+    <div class="col-lg-12">
+        <alert ng-repeat="uAlert in userAlerts" type="uAlert.type" close="closeUserAlert($index)">{{uAlert.msg}}</alert>
+        <span us-spinner spinner-key="spinner-1"></span>
+        <accordion close-others="true">
+            <accordion-group is-open="userAccordionCreate.isOpen">
+                <accordion-heading>
+                    <i class="fa" ng-class="{'fa-angle-down': userAccordionCreate.isOpen, 'fa-angle-right': !userAccordionCreate.isOpen}"></i> Create a New Super Admin Account
+                </accordion-heading>
+                 <form name="adminCreateUser" class="form-horizontal" role="form">
+                    <div class="form-group" ng-class="{'has-error': adminCreateUser.userName.$dirty && adminCreateUser.userName.$invalid}">
+                        <label for="userName" class="col-sm-2 control-label">Username</label>
+                        <div class="col-sm-6">
+                            <input id="userName" name="userName" type="text" class="form-control" ng-model="cUser.name" required ng-minlength="2" ng-maxlength="100">
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminCreateUser.userName.$dirty && adminCreateUser.userName.$error.required">Username is required!</span>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminCreateUser.userName.$dirty && adminCreateUser.userName.$error.minlength">Username must be at least 2 characters!</span>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminCreateUser.userName.$dirty && adminCreateUser.userName.$error.maxlength">Username cannot be greater than 100 characters!</span>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': adminCreateUser.userFirstName.$dirty && adminCreateUser.userFirstName.$invalid}">
+                        <label for="userFirstName" class="col-sm-2 control-label">First Name</label>
+                        <div class="col-sm-6">
+                            <input id="userFirstName" name="userFirstName" type="text" class="form-control" ng-model="cUser.firstName" required ng-maxlength="50">
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminCreateUser.userFirstName.$dirty && adminCreateUser.userFirstName.$error.required">First name is required!</span>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminCreateUser.userFirstName.$dirty && adminCreateUser.userFirstName.$error.maxlength">First name cannot be greater than 50 characters!</span>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': adminCreateUser.userLastName.$dirty && adminCreateUser.userLastName.$invalid}">
+                        <label for="userLastName" class="col-sm-2 control-label">Last Name</label>
+                        <div class="col-sm-6">
+                            <input id="userLastName" name="userLastName" type="text" class="form-control" ng-model="cUser.lastName" required ng-maxlength="50">
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminCreateUser.userLastName.$dirty && adminCreateUser.userLastName.$error.required">Last name is required!</span>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminCreateUser.userLastName.$dirty && adminCreateUser.userLastName.$error.maxlength">Last name cannot be greater than 50 characters!</span>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': adminCreateUser.userEmail.$dirty && adminCreateUser.userEmail.$invalid}">
+                        <label for="userEmail" class="col-sm-2 control-label">Email</label>
+                        <div class="col-sm-6">
+                            <input id="userEmail" name="userEmail" type="email" class="form-control" ng-model="cUser.email" required ng-maxlength="100">
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminCreateUser.userEmail.$dirty && adminCreateUser.userEmail.$error.required">Email is required!</span>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminCreateUser.userEmail.$dirty && adminCreateUser.userEmail.$error.email">Email is invalid</span>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminCreateUser.userEmail.$dirty && adminCreateUser.userEmail.$error.maxlength">Email cannot be greater than 100 characters!</span>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': adminCreateUser.password1.$dirty && adminCreateUser.password1.$invalid}">
+                        <label for="password1" class="col-sm-2 control-label">Password</label>
+                        <div class="col-sm-6">
+                            <input popover-placement="top" popover="Must contain an upper and lowercase character, a number and be at least 8 characters long" popover-trigger="focus" id="password1" name="password1" type="password" class="form-control" ng-model="cUser.passwd" required ng-pattern="/^(?=.*[A-Z])(?=.*[0-9])(?=.*[a-z]).{8,64}$/">
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminCreateUser.password1.$dirty && adminCreateUser.password1.$error.required">Password is required!</span>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminCreateUser.password1.$dirty && adminCreateUser.password1.$error.pattern">Password requirements not met!</span>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': adminCreateUser.password2.$dirty && adminCreateUser.password2.$invalid}">
+                        <label for="password2" class="col-sm-2 control-label">Re-Type Password</label>
+                        <div class="col-sm-6">
+                            <input id="password2" name="password2" type="password" class="form-control" ng-model="password2" required pw-check="password1" >
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminCreateUser.password2.$dirty && adminCreateUser.password2.$error.pwmatch">Passwords do not match!</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-6">
+                            <button ng-disabled="!adminCreateUser.$valid" type="submit" class="pull-right btn btn-info" ng-click="createUser(cUser)">Create</button>
+                        </div>
+                    </div>
+                </form>
+            </accordion-group>
+            <accordion-group is-open="userAccordionModify.isOpen">
+                <accordion-heading>
+                    <i class="fa" ng-class="{'fa-angle-down': userAccordionModify.isOpen, 'fa-angle-right': !userAccordionModify.isOpen}"></i> Modify Existing Super Admin Account
+                </accordion-heading>
+                <form name="adminUpdateUser" class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Users</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" ng-model="u" ng-options="u.name for u in users" ng-change="getSaAccount(u.id)">
+                                <option value="">Select a User</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="button" class="btn btn-default" ng-click="refreshUsers()"><i class="fa fa-refresh fa-fw"></i></button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">ID</label>
+                        <div class="col-sm-6">
+                            <input ng-disabled="true" type="text" class="form-control" ng-model="uUser.id" required ng-readonly="true">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Username</label>
+                        <div class="col-sm-6">
+                            <input ng-disabled="true" type="text" class="form-control" ng-model="uUser.name" required>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': adminUpdateUser.updateUserFirstName.$dirty && adminUpdateUser.updateUserFirstName.$invalid}">
+                        <label for="updateUserFirstName" class="col-sm-2 control-label">First Name</label>
+                        <div class="col-sm-6">
+                            <input id="updateUserFirstName" name="updateUserFirstName" type="text" class="form-control" ng-model="uUser.firstName" required ng-maxlength="50">
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminUpdateUser.updateUserFirstName.$dirty && adminUpdateUser.updateUserFirstName.$error.required">First name is required!</span>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminUpdateUser.updateUserFirstName.$dirty && adminUpdateUser.updateUserFirstName.$error.maxlength">First name cannot be greater than 50 characters!</span>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': adminUpdateUser.updateLastFirstName.$dirty && adminUpdateUser.updateLastFirstName.$invalid}">
+                        <label for="updateLastFirstName" class="col-sm-2 control-label">Last Name</label>
+                        <div class="col-sm-6">
+                            <input id="updateLastFirstName" name="updateLastFirstName" type="text" class="form-control" ng-model="uUser.lastName" required ng-maxlength="50">
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminUpdateUser.updateLastFirstName.$dirty && adminUpdateUser.updateLastFirstName.$error.required">Last name is required!</span>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminUpdateUser.updateLastFirstName.$dirty && adminUpdateUser.updateLastFirstName.$error.maxlength">Last name cannot be greater than 50 characters!</span>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': adminUpdateUser.updateEmail.$dirty && adminUpdateUser.updateEmail.$invalid}">
+                        <label for="updateEmail" class="col-sm-2 control-label">Email</label>
+                        <div class="col-sm-6">
+                            <input id="updateEmail" name="updateEmail" type="email" class="form-control" ng-model="uUser.email" required ng-maxlength="100">
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminUpdateUser.updateEmail.$dirty && adminUpdateUser.updateEmail.$error.required">Email is required!</span>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminUpdateUser.updateEmail.$dirty && adminUpdateUser.updateEmail.$error.email">Email is invalid</span>
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminUpdateUser.updateEmail.$dirty && adminUpdateUser.updateEmail.$error.maxlength">Email cannot be greater than 100 characters!</span>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': adminUpdateUser.updatePassword1.$dirty && adminUpdateUser.updatePassword1.$invalid}">
+                        <label for="updatePassword1" class="col-sm-2 control-label">Password</label>
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <input ng-model="updatePassword1Checkbox" type="checkbox" ng-change="clearPassword()">
+                                </span>
+                                <input ng-disabled="!updatePassword1Checkbox" popover-placement="top" popover="Must contain an upper and lowercase character, a number and be at least 8 characters long" popover-trigger="focus" id="updatePassword1" name="updatePassword1" type="password" class="form-control" ng-model="uUser.passwd" ng-pattern="/^(?=.*[A-Z])(?=.*[0-9])(?=.*[a-z]).{8,64}$/">
+                            </div><!-- /input-group -->
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminUpdateUser.updatePassword1.$dirty && adminUpdateUser.updatePassword1.$error.pattern">Password requirements not met!</span>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': adminUpdateUser.updatePassword2.$dirty && adminUpdateUser.updatePassword2.$invalid}">
+                        <label for="updatePassword2" class="col-sm-2 control-label">Re-Type Password</label>
+                        <div class="col-sm-6">
+                            <input ng-disabled="!updatePassword1Checkbox" id="updatePassword2" name="updatePassword2" type="password" class="form-control" ng-model="updatePassword2" pw-check="updatePassword1" >
+                            <span class="error" style="color: #a94442; font-size: 12px" ng-show="adminUpdateUser.updatePassword2.$dirty && adminUpdateUser.updatePassword2.$error.pwmatch">Passwords do not match!</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Enabled</label>
+                        <div class="col-sm-6" style="margin-top: 7px">
+                            <input type="checkbox" ng-model="uUser.enabled">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-6">
+                            <button ng-disabled="!adminUpdateUser.$valid" type="submit" class="pull-right btn btn-info" ng-click="updateUser(uUser)">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </accordion-group>
+        </accordion>
+    </div><!--/span-->
+</div><!--/row-->

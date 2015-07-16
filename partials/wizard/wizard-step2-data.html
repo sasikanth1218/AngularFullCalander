@@ -1,0 +1,326 @@
+<div data-ng-controller="wizardStep2DataController">
+    <form name="wizardJobFormStep2" class="form-horizontal" role="form">
+    <div class="row" style="margin-top: 15px;">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-cloud-upload fa-fw"></i> {{L.feedSectionTitle}}
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h4>{{L.feedSourceTypeSectionHeader}}</h4>
+                            <div class="form-group"
+                                data-ng-class="{'has-error': wizardJobFormStep2.moduleType.$dirty && wizardJobFormStep2.moduleType.$invalid}"
+                            >
+                                <label for="moduleType"
+                                    class="col-sm-4 control-label"
+                                >{{L.feedType}}:</label>
+                                <div class="col-sm-8">
+                                    <select id="moduleType"
+                                        name="moduleType"
+                                        class="form-control"
+                                        data-ng-model="moduleType"
+                                        data-ng-options="moduleType.name for moduleType in savedState.moduleTypes | filter:{subType:'DL'}"
+                                        data-ng-change="getDlModule(moduleType)"
+                                        data-ng-disabled="isBlocking()"
+                                        required
+                                    >
+                                        <option selected disabled value="">
+                                            {{L.selectFeedSourceType}}
+                                        </option>
+                                    </select>
+                                    <em> {{moduleType.description}}</em>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="lstPrivateKeys"
+                                    class="col-sm-4 control-label"
+                                >{{L.decryptWithPGPKey}}:</label>
+                                <div class="col-sm-8">
+                                    <select id="lstPrivateKeys"
+                                        class="form-control"
+                                        data-ng-model="jobConfigTemplate.pgpKeyID"
+                                        data-ng-options="pgpKey.id as pgpKey.name for pgpKey in savedState.pgpKeys"
+                                        data-ng-disabled="isBlocking() || (1 > savedState.pgpKeys.length)"
+                                    >
+                                        <option value="">
+                                            {{savedState.defaultKeySelection}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <!-- begin file upload section -->
+                    <div class="row" data-ng-show="showUploadDiv">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label for="filUpload"
+                                    class="col-sm-2 control-label"
+                                >
+                                    {{L.selectUploadFeedFile}}:
+                                </label>
+                                <div class="col-sm-8">
+                                    <span class="btn btn-default btn-file"
+                                        data-ng-disabled="isBlocking()"
+                                        data-ng-class="{'disabled': isBlocking()}"
+                                    >
+                                        <i class="fa fa-search fa-lg"></i> {{L.chooseUploadFeedFile}}
+                                        <input id="filUpload"
+                                            type="file"
+                                            data-ng-file-select="onFileSelect($files)"
+                                        >
+                                    </span>
+                                    {{savedState.selectedFile.name || L.noUploadFeedFileChosen}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div data-ng-show="showUploadProgressBar">
+                                <progressbar class="progress-striped"
+                                    value="progress"
+                                    type="info"
+                                >{{progress}}%</progressbar>
+                            </div>
+                        </div>
+                        <div class="col-lg-12"
+                            data-ng-show="showUploadSuccessPanel"
+                        >
+                            <div class="panel panel-success">
+                                <div class="panel-heading">
+                                    {{L.fileUploadSuccessHeader}}
+                                </div>
+                                <div class="panel-body">
+                                    <h4><b>{{L.feedCreatedLabel}}:</b></h4>
+                                    <p>{{L.feedIDLabel}}: {{jobConfigTemplate.dlModule.feed.id}}</p>
+                                    <p>{{L.feedFileNameLabel}}: {{jobConfigTemplate.dlModule.feed.name}}</p>
+                                    <p>{{L.feedFileSize}}: {{jobConfigTemplate.dlModule.feed.fileSizeBytes}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- begin sftp section -->
+                    <div class="row"
+                        data-ng-show="showSftpDiv"
+                        data-ng-form="wizardStepDataSFTPForm"
+                    >
+                        <div class="col-lg-6">
+                            <h4>{{L.sftpStep1Header}}</h4>
+                            <div class="form-group"
+                                data-ng-class="{'has-error': wizardStepDataSFTPForm.selectSftpConnection.$dirty && wizardStepDataSFTPForm.selectSftpConnection.$invalid}">
+                                <label for="selectSftpConnection"
+                                    class="col-sm-2 control-label"
+                                >{{L.sftpConnectionLabel}}</label>
+                                <div class="col-sm-10">
+                                    <select id="selectSftpConnection"
+                                        name="selectSftpConnection"
+                                        class="form-control"
+                                        data-ng-model="jobConfigTemplate.dlModule.sftpConnection"
+                                        data-ng-options="connection.name for connection in savedState.connections | filter:moduleType.type"
+                                        data-ng-change="showSftpBrowser()"
+                                        data-ng-required="showSftpDiv"
+                                        data-ng-disabled="isBlocking() || disableConnections">
+                                        <option value="">
+                                            {{L.sftpSelectConnection}}
+                                        </option>
+                                    </select>
+                                    <span data-ng-show="disableConnections" class="errors" style="color: #a94442; font-size: 12px">No Connections Available</span>
+                                </div>
+                            </div>
+
+                            <h4>{{L.sftpStep2Header}}</h4>
+                            <div class="form-group"
+                                data-ng-class="{'has-error': wizardStepDataSFTPForm.remotePathInput.$dirty && wizardStepDataSFTPForm.remotePathInput.$invalid}"
+                            >
+                                <label for="remotePathInput"
+                                    class="col-sm-2 control-label"
+                                >{{L.sftpPathLabel}}</label>
+                                <div class="col-sm-10">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <input type="checkbox"
+                                                data-ng-disabled="isBlocking() || disableRemotePathInputGroup"
+                                                data-ng-model="savedState.remotePathCheckbox"
+                                                data-ng-change="showSftpBrowser()"
+                                            >
+                                        </span>
+                                        <input id="remotePathInput"
+                                            name="remotePathInput"
+                                            type="text"
+                                            class="form-control"
+                                            data-ng-disabled="isBlocking() || disableRemotePathInputGroup"
+                                            data-ng-model="jobConfigTemplate.dlModule.remotePath"
+                                            data-ng-required="showSftpDiv"
+                                            data-ng-pattern="/^\/.*$/"
+                                            data-ng-readonly="!savedState.remotePathCheckbox"
+                                            placeholder="{{L.sftpPathPlaceholder}}"
+                                        >
+                                    </div>
+                                    <span class="error"
+                                        style="color: #a94442; font-size: 12px"
+                                        data-ng-show="wizardStepDataSFTPForm.remotePathInput.$dirty && wizardStepDataSFTPForm.remotePathInput.$error.required"
+                                    >{{L.errorSFTPPathRequired}}</span>
+                                    <span class="error"
+                                        style="color: #a94442; font-size: 12px"
+                                        data-ng-show="wizardStepDataSFTPForm.remotePathInput.$dirty && wizardStepDataSFTPForm.remotePathInput.$error.pattern"
+                                    >{{L.errorSFTPPathInvalid}}</span>
+                                </div>
+                            </div>
+
+                            <h4>{{L.sftpStep3Header}}
+                                <a class="pull-right"
+                                    data-ng-click="savedState.collapseSftpFileMaskTooltip = !savedState.collapseSftpFileMaskTooltip"
+                                ><i class="fa fa-question-circle fa-fw"></i></a>
+                            </h4>
+                            <div class="col-sm-12"
+                                collapse="savedState.collapseSftpFileMaskTooltip"
+                            >
+                                <div class="alert alert-info"
+                                    data-ng-bind-html="sftpFileMaskTooltip"
+                                ></div>
+                            </div>
+                            <div class="form-group"
+                                data-ng-class="{'has-error': (wizardStepDataSFTPForm.filePrefix.$dirty && wizardStepDataSFTPForm.filePrefix.$invalid) || (wizardStepDataSFTPForm.fileSuffix.$dirty && wizardStepDataSFTPForm.fileSuffix.$invalid) }"
+                            >
+                                <label for="filePrefix"
+                                    class="col-sm-2 control-label"
+                                >{{L.sftpFileMaskPrefixLabel}}</label>
+                                <div class="col-sm-4">
+                                    <input id="filePrefix"
+                                        name="filePrefix"
+                                        type="text"
+                                        class="form-control"
+                                        data-ng-model="jobConfigTemplate.dlModule.filePrefix"
+                                        data-ng-required="showSftpDiv"
+                                        placeholder="{{L.sftpFileMaskPrefixPlaceholder}}"
+                                        data-ng-pattern="/^[A-Za-z0-9\*\?\._ -]{1,100}$/"
+                                        data-ng-maxlength="100"
+                                        maxlength="100"
+                                        data-ng-disabled="isBlocking()"
+                                    >
+                                    <span class="error"
+                                        style="color: #a94442; font-size: 12px"
+                                        data-ng-show="wizardStepDataSFTPForm.filePrefix.$dirty && wizardStepDataSFTPForm.filePrefix.$error.required"
+                                    >{{L.errorSFTPFileMaskPrefixRequired}}</span>
+                                    <span class="error"
+                                        style="color: #a94442; font-size: 12px"
+                                        data-ng-show="wizardStepDataSFTPForm.filePrefix.$dirty && wizardStepDataSFTPForm.filePrefix.$error.pattern"
+                                    >{{L.errorSFTPFileMaskPrefixInvalid}}</span>
+                                    <span class="error"
+                                        style="color: #a94442; font-size: 12px"
+                                        data-ng-show="wizardStepDataSFTPForm.filePrefix.$dirty && wizardStepDataSFTPForm.filePrefix.$error.maxlength"
+                                    >{{L.errorSFTPFileMaskPrefixMaxLength}}</span>
+                                </div>
+                                <label for="fileSuffix"
+                                    class="col-sm-2 control-label"
+                                >{{L.sftpFileMaskSuffixLabel}}</label>
+                                <div class="col-sm-4">
+                                    <input id="fileSuffix"
+                                        name="fileSuffix"
+                                        type="text"
+                                        class="form-control"
+                                        data-ng-model="jobConfigTemplate.dlModule.fileSuffix"
+                                        data-ng-required="showSftpDiv"
+                                        data-ng-pattern="/^[a-z0-9\*\?\._ -]*\.(csv|txt|data?|tab|gpg|pgp|zip)$/i"
+                                        placeholder="{{L.sftpFileMaskSuffixPlaceholder}}"
+                                        data-ng-maxlength="100"
+                                        maxlength="100"
+                                        data-ng-disabled="isBlocking()"
+                                    >
+                                    <span class="error"
+                                        style="color: #a94442; font-size: 12px"
+                                        data-ng-show="wizardStepDataSFTPForm.fileSuffix.$dirty && wizardStepDataSFTPForm.fileSuffix.$error.required"
+                                    >{{L.errorSFTPFileMaskSuffixRequired}}</span>
+                                    <span class="error"
+                                        style="color: #a94442; font-size: 12px"
+                                        data-ng-show="wizardStepDataSFTPForm.fileSuffix.$dirty && wizardStepDataSFTPForm.fileSuffix.$error.pattern"
+                                    >{{L.errorSFTPFileMaskSuffixInvalid}}</span>
+                                    <span class="error"
+                                        style="color: #a94442; font-size: 12px"
+                                        data-ng-show="wizardStepDataSFTPForm.fileSuffix.$dirty && wizardStepDataSFTPForm.fileSuffix.$error.maxlength"
+                                    >{{L.errorSFTPFileMaskSuffixMaxLength}}</span>
+                                </div>
+                            </div>
+                            <h4>{{L.sftpStep4Header}}</h4>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"></label>
+                                <div class="col-sm-4">
+                                    <button type="button"
+                                        class="btn btn-default btn-block"
+                                        data-ng-disabled="isBlocking() || !wizardStepDataSFTPForm.$valid"
+                                        data-ng-click="retrieveSFTPSample()"
+                                    >{{L.retrieveSFTPSample}}</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6" data-ng-show="showSftpBrowserDiv">
+                            <h4>
+                                {{interpolate(L.sftpBrowsingConnection, jobConfigTemplate.dlModule.sftpConnection.hostname)}}
+                            </h4>
+                            <alert style="margin-top: 10px"
+                                data-ng-repeat="sftpBrowserAlert in savedState.sftpBrowserAlerts"
+                                type="sftpBrowserAlert.type"
+                                close="closeSftpBrowserAlert($index)"
+                            >{{sftpBrowserAlert.msg}}</alert>
+                            <div class="panel panel-default"
+                                collapse="collapseSftpBrowser"
+                            >
+                                <div class="panel-body">
+                                    <treecontrol class="tree-classic"
+                                        tree-model="treeData"
+                                        on-selection="setPathAndDrillDown(node)"
+                                        selected-node="savedState.selectedNode"
+                                    >
+                                        {{node.label}}
+                                    </treecontrol>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12"
+                            data-ng-show="showSftpRetrieveDiv"
+                        >
+                            <hr>
+                            <div class="col-lg-12">
+                                <div data-ng-show="showSFTPProgressBar">
+                                    <progressbar class="progress-striped"
+                                        value="progress"
+                                        type="info"
+                                    >{{progress}}%</progressbar>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <alert data-ng-repeat="dataUploadAlert in dataUploadAlerts"
+                                    type="dataUploadAlert.type"
+                                    close="closeDataUploadAlert($index)"
+                                >{{dataUploadAlert.msg}}</alert>
+                            </div>
+                            <div class="col-lg-12" data-ng-hide="isHidden">
+                                <div class="panel panel-success">
+                                    <div class="panel-heading">
+                                        {{L.sftpRetrievalSuccessHeader}}
+                                    </div>
+                                    <div class="panel-body">
+                                        <h4><b>{{L.feedCreatedLabel}}:</b></h4>
+                                        <p>{{L.feedIDLabel}}: {{jobConfigTemplate.dlModule.feed.id}}</p>
+                                        <p>{{L.feedFileNameLabel}}: {{jobConfigTemplate.dlModule.feed.name}}</p>
+                                        <p>{{L.feedFileSize}}: {{jobConfigTemplate.dlModule.feed.fileSizeBytes}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Give AngularJS something on the form to track for file-acquisition validity -->
+    <input type="checkbox"
+        data-ng-model="savedState.wizardJobFormStep2ValidationFlag"
+        data-ng-hide="true"
+        required
+    >
+    </form>
+</div>

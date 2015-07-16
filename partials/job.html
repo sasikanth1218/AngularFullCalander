@@ -1,0 +1,186 @@
+<style>
+    .fa-sort-asc{
+        color : #333333;
+    }
+    .fa-sort-desc{
+        color : #333333;
+    }
+    .fa-sort{
+        color : #BBBBBB;
+    }
+</style>
+<div id="page-wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Jobs > {{job.id}}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-align-justify fa-fw"></i> Overview
+                </div>
+                <div class="panel-body">
+                    <span us-spinner spinner-key="spinner-1"></span>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h4>Job</h4>
+                            <div>
+                                <h4><strong>Type: </strong><a href="" >{{ job.type || 'empty' }}</a></h4>
+                            </div>
+                            <div>
+                                <h4><strong>Name: </strong><a href="" data-editable-text="job.name" data-onbeforesave="validateJobName($data)" data-onaftersave="updateJob()">{{ job.name || 'empty' }}</a></h4>
+                            </div>
+                            <div>
+                                <h4><strong>Description: </strong><a href="" data-editable-text="job.description" data-onbeforesave="validateJobDescription($data)" data-onaftersave="updateJob()">{{ job.description || 'empty' }}</a></h4>
+                            </div>
+                            <div>
+                                <h4><strong>Created: </strong><a href="" >{{ job.creationDate | date:'yyyy-MM-dd HH:mm:ss Z' || ''}}</a></h4>
+                            </div>
+                            <div>
+                                <h4><strong>State: </strong><a href="" >{{ job.state || '' }}</a></h4>
+                            </div>
+                            <div>
+                                <h4><strong>Status: </strong><a href="" >{{ job.execState || '' }}</a></h4>
+                            </div>
+                        </div>
+                        <div class="col-lg-6" data-ng-show="showSchedule()">
+                            <div data-ng-repeat="schedule in schedules">
+                                <h4>Schedule - <small><a href="" data-editable-text="schedule.name" data-onbeforesave="validateScheduleName($data)" data-onaftersave="updateSchedule(schedule)">{{ schedule.name || 'empty' }}</a></small></h4>
+                                <div>
+                                    <h4><strong>Description: </strong><a href="" data-editable-text="schedule.description" data-onbeforesave="validateScheduleDescription($data)" data-onaftersave="updateSchedule(schedule)">{{ schedule.description || 'empty' }}</a></h4>
+                                </div>
+                                <div>
+                                    <h4><strong>Start Date: </strong><a href="" data-editable-bsdate="schedule.startDate" e-datepicker-popup="yyyy-MM-dd" e-show-weeks="false" data-onaftersave="updateSchedule(schedule)">{{ (schedule.startDate | date:'yyyy-MM-dd') || 'empty' }}</a></h4>
+                                </div>
+                                <div>
+                                    <h4><strong>Start Time: </strong><a href="" data-editable-bstime="schedule.startDate" e-show-meridian="false" e-minute-step="15" data-onaftersave="updateSchedule(schedule)">{{ (schedule.startDate | date:"HH:mm") || 'empty' }}</a></h4>
+                                </div>
+                                <div>
+                                    <h4><strong>End Date: </strong><a href="" data-editable-bsdate="schedule.endDate" e-datepicker-popup="yyyy-MM-dd" e-show-weeks="false" data-onaftersave="updateSchedule(schedule)">{{ (schedule.endDate | date:'yyyy-MM-dd') || 'empty' }}</a></h4>
+                                </div>
+                                <div>
+                                    <h4><strong>End Time: </strong><a href="" data-editable-bstime="schedule.endDate" e-show-meridian="false" e-minute-step="15" data-onaftersave="updateSchedule(schedule)">{{ (schedule.endDate | date:"HH:mm") || 'empty' }}</a></h4>
+                                </div>
+                                <div>
+                                    <h4><a href="" buttons="no" data-editable-checkbox="schedule.enabled" e-title="Enable?" data-onaftersave="updateSchedule(schedule)">{{ schedule.enabled && "Enabled" || "Disabled" }}</a></h4>
+                                </div>
+                                <div>
+                                    <h4><strong>Run Every (Cron): </strong><a href="" data-editable-text="schedule.cronString" data-onbeforesave="validateCron($data)" data-onaftersave="updateSchedule(schedule)" >{{ schedule.cronString || 'empty' }}</a> <strong> UTC </strong></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="pull-right">
+                                <!--<a title="Edit Job Definition" class="btn btn-info" data-ng-disabled="true" data-ng-click=""><i class="fa fa-pencil"></i></a>-->
+                                <a data-ng-controller="executeJobController" title="Execute Job" class="btn btn-warning" data-ng-click="open(job)" data-ng-disabled="{{!user.authorities.JOBS[4]}}"><i class="fa fa-play"></i></a>
+                                <a data-ng-controller="deleteJobController" title="Delete Job" class="btn btn-danger" data-ng-click="open(job)" data-ng-disabled="{{!user.authorities.JOBS[3]}}"><i class="fa fa-trash-o"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading"><i class="fa fa-play-circle fa-fw"></i> Job Executions
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12"> <!--row above -->
+                            <h4>Click on the view icon to drill into an execution</h4>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-lg-12" style="overflow: auto">
+                            <table class="table table-striped table-hover" id ="tableExecutions">
+                                <thead>
+                                <tr>
+
+                                    <th ng-click="orderBy('batch_Id')">ID
+                                            <i class="fa fa-fw fa-sort" ng-show="'batch_Id' !== orderColumn"></i>
+                                            <i class="fa fa-fw fa-sort-asc"
+                                               data-ng-show="'batch_Id' == orderColumn && 'asc' == orderDirection"></i>
+                                            <i class="fa fa-fw fa-sort-desc"
+                                               data-ng-show="'batch_Id' == orderColumn && 'asc' != orderDirection"></i>
+                                    </th>
+                                    <th>JOB</th>
+                                    <th>JOB ID</th>
+                                    <th>STATUS</th>
+                                    <th>STATUS MESSAGE</th>
+                                    <th data-ng-click="orderBy('start_Date')">START
+                                            <i class="fa fa-fw fa-sort" ng-show="'start_Date' !== orderColumn"></i>
+                                            <i class="fa fa-fw fa-sort-asc" data-ng-show="'start_Date' == orderColumn && 'asc' == orderDirection"></i>
+                                            <i class="fa fa-fw fa-sort-desc" data-ng-show="'start_Date' == orderColumn && 'asc' != orderDirection"></i>
+                                    </th>
+                                    <th data-ng-click="orderBy('end_Date')">END
+                                            <i class="fa fa-fw fa-sort" ng-show="'end_Date' !== orderColumn"></i>
+                                            <i class="fa fa-fw fa-sort-asc" data-ng-show="'end_Date' == orderColumn && 'asc' == orderDirection"></i>
+                                            <i class="fa fa-fw fa-sort-desc" data-ng-show="'end_Date' == orderColumn && 'asc' != orderDirection"></i>
+                                    </th>
+                                    <th>ELAPSED (ms)</th>
+                                    <th>TOTAL</th>
+                                    <th>PROCESSED</th>
+                                    <th>REJECTED</th>
+                                    <th>&nbsp;</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr data-ng-repeat="execution in executions" data-ng-style="executionRecordStyle(execution.status)">
+                                    <td class="numericData">#{{execution.id}}#</td>
+                                    <td class="textData">{{execution.executedJob}}</td>
+                                    <td class="numericData">{{execution.executedJobId}}</td>
+                                    <td class="textData">{{execution.status}}</td>
+                                    <td class="rawData">{{execution.statusCode}} - {{execution.statusMessage}}</td>
+                                    <td class="timeData">{{execution.start | date:'yyyy-MM-dd HH:mm:ss'}} </td>
+                                    <td class="timeData">{{execution.end | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                                    <td class="numericData">{{execution.elapsed | number:0}}</td>
+                                    <td class="numericData">{{execution.total | number:0}}</td>
+                                    <td class="numericData">{{execution.processed | number:0}}</td>
+                                    <td class="numericData">{{execution.rejected | number:0}}</td>
+                                    <td class="rowControls">
+                                        <a href="#!jobs/{{execution.executedJobId}}/executions/{{execution.id}}" title="View Execution" class="btn btn-info" data-ng-disabled="{{!user.authorities.EXECUTIONS[0]}}">
+                                            <i class="fa fa-search"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Disabled until the blockers are resolved for DE5396: Add Pagination to Individual Job Detail and Job's Execution Detail
+-->
+    <div class="paginationControls">
+        <div>
+            <pagination class="pagination-sm"
+                first-text="&lsaquo;&lsaquo;"
+                previous-text="&lsaquo;"
+                next-text="&rsaquo;"
+                last-text="&rsaquo;&rsaquo;"
+                boundary-links="true"
+                max-size="pagination.maxSize"
+                total-items="pagination.totalItems"
+                ng-model="pagination.currentPage"
+                page="pagination.currentPage"
+                items-per-page="pagination.itemsPerPage"
+                on-select-page="setPage(page)"
+                ng-change="setPage(page)"
+            ></pagination>
+        </div>
+        <div class="paginationStats">
+            {{pagination.showingFirstIndex + " - " + pagination.showingLastIndex + " of " + pagination.totalItems + "
+            Executions"}}
+        </div>
+    </div>
+</div>
